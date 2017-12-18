@@ -1,0 +1,9 @@
+{
+    "path" : "~/cmf/pkg/cmf",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}
