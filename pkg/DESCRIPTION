@@ -1,4 +1,4 @@
-Package: cinf
+Package: cmf
 Version: 0.0-19
 Title: Basic tools for chemoinformatics
 Authors@R: c(person("Igor", "Baskin", role = c("aut", "cre"), 
