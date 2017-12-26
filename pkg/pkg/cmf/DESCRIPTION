@@ -1,10 +1,9 @@
-Package: cinf
+Package: cmf
 Version: 0.0-19
-Title: Basic tools for chemoinformatics
-Authors@R: c(person("Igor", "Baskin", role = c("aut", "cre"), 
-                    email = "igbaskin@gmail.com"))
-Description: The package provides basics tools for chemoinformatics:
-	manipulation with chemical structures, reading/writing files
-	with chemical structures, etc
+Title: Continuous molecular fields(CMF)
+Authors@R: c(person("Igor", "Baskin", role = c("aut","cre" ), 
+                    email = "igbaskin@gmail.com"),
+                    person("Eugene", "Shklyar", role = "ctb",
+                    email = "shklyar.eugene@gmail.com"))
+Description: The package implements the continuous molecular fields(CMF) approach to building 3D-QSAR models.
 License: GPL (>= 2)
-
