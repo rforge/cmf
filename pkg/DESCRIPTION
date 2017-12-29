@@ -1,6 +1,6 @@
-Package: cmf
+Package: conmolfilds
 Version: 0.0-19
-Title: Continuous molecular fields(CMF)
+Title: Continuous molecular fields
 Authors@R: c(person("Igor", "Baskin", role = c("aut","cre" ),
                     email = "igbaskin@gmail.com"),
                     person("Eugene", "Shklyar", role = "ctb",
