@@ -66,9 +66,8 @@ cmf_view_mol_field_cofield
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+if(FALSE)
+{
 # View overlapping fields of regression coefficients and molecular fields
 
 #source("cmf-view-mol-field-cofield.R")
@@ -113,7 +112,7 @@ cmf_view_mol_field_cofield(
   draw_overlap = FALSE
 )
 
-
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
