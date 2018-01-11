@@ -2,7 +2,7 @@
 
 require(rgl)
 
-source("R/cinf-mol2.R")
+#source("R/cinf-mol2.R")
 #source("cinf-molview.R")
 #source("cmf-gridview.R")
 #source("cmf-grid.R")
