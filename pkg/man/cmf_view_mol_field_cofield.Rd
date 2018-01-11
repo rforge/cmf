@@ -102,7 +102,6 @@ cmf_view_mol_field_cofield(
   mdb_fname = mdb_fname, 
   imol = imol, 
   ft = ft, 
-  grid_fname = grid_fname, 
   grid_fname = "ligands-grid-krr.RData",
   alpha_from_model = alpha_from_model, 
   model_fname = model_fname, 
@@ -110,7 +109,8 @@ cmf_view_mol_field_cofield(
   rlevel = rlevel, 
   alpha_g = alpha_g,
   draw_field = TRUE,
-  draw_cofield = FALSE
+  draw_cofield = FALSE,
+  draw_overlap = FALSE
 )
 
 
