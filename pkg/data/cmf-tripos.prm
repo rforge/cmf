@@ -1,0 +1,73 @@
+##########################
+### Tripos Force Field ###
+##########################
+
+### Force Field Name ###
+forcefield  TRIPOS
+
+########################################
+###           Atom Types             ###
+###----------------------------------###
+### C.1   - force field atom type    ###
+### C     - chemical element         ###
+### 1.7   - R - van-der-Waals radius ###
+### 0.107 - E - van-der-Waals energy ###
+########################################
+atomtype  C.1   C   1.7     0.107
+atomtype  C.2   C   1.7     0.107
+atomtype  C.3   C   1.7     0.107
+atomtype  C.ar  C   1.7     0.107
+atomtype  C.cat C   1.7     0.107
+atomtype  N.1   N   1.55    0.095
+atomtype  N.2   N   1.55    0.095
+atomtype  N.3   N   1.55    0.095
+atomtype  N.4   N   1.55    0.095
+atomtype  N.am  N   1.55    0.095
+atomtype  N.ar  N   1.55    0.095
+atomtype  N.pl3 N   1.55    0.095
+atomtype  O.2   O   1.52    0.116
+atomtype  O.3   O   1.52    0.116
+atomtype  O.co2 O   1.52    0.116
+atomtype  S.2   S   1.8     0.314
+atomtype  S.3   S   1.8     0.314
+atomtype  S.o   S   1.7     0.314
+atomtype  S.o2  S   1.7     0.314
+atomtype  P.3   P   1.8     0.314
+atomtype  H     H   1.5     0.042
+atomtype  F     F   1.47    0.109
+atomtype  Cl    Cl  1.75    0.314
+atomtype  Br    Br  1.85    0.434
+atomtype  I     I   1.98    0.623
+atomtype  Li    Li  1.2     0.4
+atomtype  Na    Na  1.2     0.4
+atomtype  K     K   1.2     0.4
+atomtype  Ca    Ca  1.2     0.6
+atomtype  Al    Al  1.2     0.042
+atomtype  Si    Si  2.1     0.042
+atomtype  O.t3p O   1.76825 0.15207
+atomtype  H.t3p H   1.008   0
+atomtype  O.spc O   1.7766  0.1554
+atomtype  H.spc H   1.008   0
+atomtype  LP    -   1e-05   1e-05
+atomtype  Du    -   0       0
+atomtype  Du.C  -   0       0
+atomtype  ANY   -   1.7     0.107
+atomtype  HEV   -   1.7     0.107
+atomtype  HET   -   1.55    0.095
+atomtype  HAL   -   1.75    0.314
+
+###################################
+###         Bond Types          ###
+###-----------------------------###
+### ar  - force field bond type ###
+### 4   - universal bond type   ###
+###################################
+bondtype  1   1
+bondtype  2   2
+bondtype  3   3
+bondtype  ar  4
+bondtype  am  1
+bondtype  du  -
+bondtype  un  -
+bondtype  nc  -
+
