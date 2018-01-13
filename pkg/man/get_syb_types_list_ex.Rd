@@ -44,7 +44,8 @@ get_syb_types_list_ex(mdb, min_occ=min_occ, good_list=good_list, bad_list=bad_li
 }
 \examples{
 # Remove if(FALSE) block while testing, please notice file "ligands-train.mol2"
-should exist
+#should exist
+
 if(FALSE)
 {
 # Training set file name
