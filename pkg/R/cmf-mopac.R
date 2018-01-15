@@ -1,0 +1,728 @@
+# Interface to the MOPAC program
+
+#source("cinf-mol2.R")
+#source("cmf-comp-kernels.R")
+#source("cmf-coef.R")
+#source("cmf-fields.R")
+
+mopac_fields <- c("mop_q", "mop_dn", "mop_de", "mop_pis", "mop_homo", "mop_lumo")
+
+# Returns charge of molecule
+get_mol_charge <- function(mol) {
+  natoms <- length(mol$atoms)
+  charge <- 0
+  for (i in 1:natoms) charge <- charge + mol$atoms[[i]]$pch
+  charge
+}
+
+# Writes MOPAC inpout file with Cartesian coordinates
+write_mopac_input_file <- function(mol, fname) {
+  charge <- get_mol_charge(mol)
+  natoms <- length(mol$atoms)
+  of <- file(fname, "w")
+  cat(sprintf("AUX LARGE CHARGE=%g GEO_REF=\"SELF\" SUPER\n", charge), file=of)
+  cat("\n", file=of)
+  cat("\n", file=of)
+  for (iatom in 1:natoms) {
+    atom <- mol$atoms[[iatom]]
+    cat(sprintf("%-2s%9.5f 1%9.5f 1%9.5f 1\n", atom$el, atom$x, atom$y, atom$z), file=of)
+  }
+  close(of)
+}
+
+run_mopac <- function(fname)
+{
+  shell(paste("mopac2012.exe", "aaa.mop"))
+}
+
+read_mopac_aux_file <- function(fname) {
+
+  # proceed to next line
+  next_line <- function() {
+    iline <<- iline + 1
+	aline <<- aux_lines[iline]
+  }
+  
+  # read ncount string tokens
+  read_strings <- function(count) {
+	res <- character(count)
+    icount <- 0
+	while (icount < count) {
+	  next_line()
+	  tokens <- strsplit(aline, " +", perl=TRUE)[[1]]
+	  ntokens <- length(tokens)
+	  for (itoken in 2:ntokens) {
+	    token <- tokens[itoken]
+		res[icount+itoken-1] <- token
+	  }
+	  icount <- icount + ntokens - 1
+	}
+	res
+  }
+
+  # read ncount integers
+  read_integers <- function(count) {
+    string_tokens <- read_strings(count)
+	as.integer(string_tokens)
+  }
+  
+  # read ncount real numbers
+  read_reals <- function(count) {
+    string_tokens <- read_strings(count)
+	as.numeric(string_tokens)
+  }
+  
+  # read coordinates of atoms in molecule
+  read_coordinates <- function(natoms) {
+    coord <- matrix(nrow=natoms, ncol=3)
+	for (iatom in 1:natoms) {
+	  next_line()
+	  coord[iatom,1] <- as.numeric(substr(aline, 1, 10)) 
+	  coord[iatom,2] <- as.numeric(substr(aline, 11, 20))
+	  coord[iatom,3] <- as.numeric(substr(aline, 21, 30))
+	}
+	coord
+  }
+  
+  # read lower half triangle
+  read_lower_half_triangle <- function(size) {
+    count <- size * (size + 1) / 2
+    matr <- matrix(nrow=size, ncol=size)
+	next_line()
+	values <- read_reals(count)
+	# copy array values to lower triangle
+	ival <- 0
+	for (i in 1:size)
+	  for (j in 1:i) {
+	    ival <- ival + 1
+		matr[i,j] <- values[ival]
+		matr[j,i] <- matr[i,j]
+	  }
+	matr
+  }
+  
+  # read rectangular matrix
+  read_matrix <- function(nrows, ncols) {
+    count <- nrows * ncols
+	matr <- matrix(nrow=nrows, ncol=ncols)
+	values <- read_reals(count)
+	ival <- 0
+	for (i in 1:nrows)
+	  for (j in 1:ncols) {
+	    ival <- ival + 1
+		matr[i,j] <- values[ival]
+	  }
+	matr
+  }
+  
+  aux_lines <- readLines(fname)
+  nlines <- length(aux_lines)
+  iline <- 0
+  while (iline < nlines) {
+    next_line()
+	
+	# Read scalar values
+	r <-  regexpr("([A-Z_]+):[A-Z/]+=([0-9+-.D]+)$", aline, perl=TRUE)
+	if (r > 0) {
+	  start1 <- attr(r, "capture.start")[1]
+	  stop1 <- start1 + attr(r, "capture.length")[1] - 1
+	  name <- substr(aline, start1, stop1)
+	  start2 <- attr(r, "capture.start")[2]
+	  stop2 <- start2 + attr(r, "capture.length")[2] - 1
+      valstr1 <- substr(aline, start2, stop2)
+	  valstr2 <- sub("D", "E", valstr1)
+	  value <- as.numeric(valstr2)
+	  if (name == "HEAT_OF_FORMATION") {
+	    heat_of_formation <- value
+		next
+	  }
+	  if (name == "TOTAL_ENERGY") {
+	    total_energy <- value
+		next
+	  }
+	  if (name == "DIPOLE") {
+	    dipole <- value
+		next
+	  }
+	}
+	
+	# Read vectors and matrices
+	r <-  regexpr("([A-Z_:]+).([0-9]+).= *$", aline, perl=TRUE)
+	if (r > 0) {
+	  start1 <- attr(r, "capture.start")[1]
+	  stop1 <- start1 + attr(r, "capture.length")[1] - 1
+	  name <- substr(aline, start1, stop1)
+	  start2 <- attr(r, "capture.start")[2]
+	  stop2 <- start2 + attr(r, "capture.length")[2] - 1
+	  count <- as.integer(substr(aline, start2, stop2))
+	  if (name == "ATOM_EL") {
+	    natoms <- count
+		atom_el <- read_strings(count)
+		next
+	  }
+	  if (name == "ATOM_CORE") {
+	    atom_core <- read_integers(count)
+		next
+	  }
+	  if (name == "ATOM_X:ANGSTROMS") {
+	    atom_x <- read_coordinates(natoms)
+		next
+	  }
+	  if (name == "AO_ATOMINDEX") {
+	    naorbitals <- count
+	    ao_atomindex <- read_integers(count)
+		next
+	  }
+	  if (name == "ATOM_SYMTYPE") {
+	    atom_symtype <- read_strings(count)
+		next
+	  }
+	  if (name == "AO_ZETA") {
+	    ao_zeta <- read_reals(count)
+		next
+	  }
+	  if (name == "ATOM_PQN") {
+	    atom_pqn <- read_integers(count)
+		next
+	  }
+	  if (name == "ATOM_X_OPT:ANGSTROMS") {
+	    atom_x_opt <- read_coordinates(natoms)
+		next
+	  }
+	  if (name == "ATOM_CHARGES") {
+	    atom_charges <- read_reals(count)
+		next
+	  }
+	  if (name == "OVERLAP_MATRIX") {
+	    overlap_matrix <- read_lower_half_triangle(naorbitals)
+		next
+	  }
+	  if (name == "EIGENVECTORS") {
+	    nmorbitals <- count / naorbitals
+        eigenvectors <- read_matrix(nmorbitals, naorbitals)
+        next 		
+	  }
+	  if (name == "TOTAL_DENSITY_MATRIX") {
+	    total_density_matrix <- read_lower_half_triangle(naorbitals)
+		next
+	  }
+	  if (name == "EIGENVALUES") {
+	    eigenvalues <- read_reals(count)
+		next
+	  }
+	  if (name == "MOLECULAR_ORBITAL_OCCUPANCIES") {
+	    molecular_orbital_occupancies <- read_reals(count)
+		next
+	  }
+	}
+  }
+  list(
+    natoms = natoms,
+	naorbitals = naorbitals,
+	nmorbitals = nmorbitals,
+    atom_el = atom_el, 
+	atom_core = atom_core, 
+	atom_x = atom_x, 
+	ao_atomindex = ao_atomindex,
+	atom_symtype = atom_symtype,
+	ao_zeta = ao_zeta,
+	atom_pqn = atom_pqn,
+	atom_x_opt = atom_x_opt,
+	atom_charges = atom_charges,
+	overlap_matrix = overlap_matrix,
+	eigenvectors = eigenvectors,
+	total_density_matrix = total_density_matrix,
+	eigenvalues = eigenvalues,
+	molecular_orbital_occupancies = molecular_orbital_occupancies,
+	heat_of_formation = heat_of_formation,
+	total_energy = total_energy,
+	dipole = dipole
+  )
+}
+
+read_mopac_out_file <- function(fname, mol) {
+ 
+  # proceed to next line
+  next_line <- function() {
+    iline <<- iline + 1
+	aline <<- arc_lines[iline]
+  }
+  
+  get_num_heavy_atoms <- function(mol) {
+	iheavy <- 0	
+	for (atom in mol$atoms) {
+	  if (atom$el != "H") iheavy <- iheavy + 1
+	}
+	return(iheavy)
+  }
+  
+  arc_lines <- readLines(fname)
+  nlines <- length(arc_lines)
+  iline <- 0
+  
+  # Skip to superdelocalizabilities
+  while (iline < nlines) {
+    next_line()
+    r <- regexpr("           SUPERDELOCALIZABILITIES", aline)
+	if (r > 0) break
+  }
+  
+  # Read several scalar values
+  next_line()
+  next_line()
+  mulliken_electronegativity <- as.numeric(substr(aline, 34, 44))
+  next_line()
+  parr_pople_absolute_hardness <- as.numeric(substr(aline, 34, 44))
+  next_line()
+  schuurmann_mo_shift_alpha <- as.numeric(substr(aline, 34, 44))
+  next_line()
+  next_line()
+  ehomo <- as.numeric(substr(aline, 34, 44))
+  next_line()
+  elumo <- as.numeric(substr(aline, 34, 44))
+  for (i in 1:4) next_line()
+  
+  # Read arrays with superdelocalizabilities
+  num_heavy_atoms <- get_num_heavy_atoms(mol)
+  heavy_atom_index <- integer(num_heavy_atoms)
+  Dn <- double(num_heavy_atoms)
+  De <- double(num_heavy_atoms)
+  qZ <- double(num_heavy_atoms)
+  piS <- double(num_heavy_atoms)
+  chomo <- double(num_heavy_atoms)
+  clumo <- double(num_heavy_atoms)
+  # Read Dn(r), De(r) and q(r)-Z(r)
+  for (i in 1:num_heavy_atoms) {
+    next_line()
+    heavy_atom_index[i] <- as.integer(substr(aline, 5, 7))
+	Dn[i] <- as.numeric(substr(aline, 11, 20))
+	De[i] <- as.numeric(substr(aline, 24, 33))
+	qZ[i] <- as.numeric(substr(aline, 37, 46))
+  }
+  for (i in 1:5) next_line()
+  # Read piS
+  for (i in 1:num_heavy_atoms) {
+    next_line()
+	piS[i] <- as.numeric(substr(aline, 11, 20))
+  }
+  for (i in 1:5) next_line()
+  # Read homo and lumo
+  for (i in 1:num_heavy_atoms) {
+    next_line()
+	chomo[i] <- as.numeric(substr(aline, 24, 33))
+	clumo[i] <- as.numeric(substr(aline, 37, 46))
+  }
+  
+  list(
+    num_heavy_atoms = num_heavy_atoms,
+	heavy_atom_index = heavy_atom_index,
+	Dn = Dn,
+	De = De,
+	qZ = qZ,
+	piS = piS,
+	chomo = chomo,
+	clumo = clumo,
+	mulliken_electronegativity = mulliken_electronegativity,
+	parr_pople_absolute_hardness = parr_pople_absolute_hardness,
+	schuurmann_mo_shift_alpha = schuurmann_mo_shift_alpha,
+	ehomo = ehomo,
+	elumo = elumo
+  )
+}
+
+calc_fukui <- function(mol, mopac_aux) {
+
+  get_num_heavy_atoms <- function(mol) {
+	iheavy <- 0	
+	for (atom in mol$atoms) {
+	  if (atom$el != "H") iheavy <- iheavy + 1
+	}
+	return(iheavy)
+  }
+
+  # Initialization
+  num_heavy_atoms <- get_num_heavy_atoms(mol)
+  Dn <- double(num_heavy_atoms)
+  De <- double(num_heavy_atoms)
+  piS <- double(num_heavy_atoms)
+  chomo <- double(num_heavy_atoms)
+  clumo <- double(num_heavy_atoms)
+  
+  # Find heavy atoms
+  natoms <- length(mol$atoms)
+  heavy_atom_index <- integer(num_heavy_atoms)
+  num_heavy_atom <- integer(natoms)
+  iheavy <- 0
+  for (iatom in 1:natoms) {
+    atom <- mol$atoms[[iatom]]
+	if (atom$el != "H") {
+	  iheavy <- iheavy + 1
+	  heavy_atom_index[iheavy] <- iatom
+	  num_heavy_atom[iatom] <- iheavy
+	}
+  }
+  
+  # Compute global values
+  nelectrons <- sum(mopac_aux$molecular_orbital_occupancies)
+  ihomo <- nelectrons / 2
+  ilumo <- ihomo + 1
+  ehomo <- mopac_aux$eigenvalues[ihomo]
+  elumo <- mopac_aux$eigenvalues[ilumo]
+  alpha <- (ehomo + elumo) / 2
+  mulliken_electronegativity <- -alpha
+  parr_pople_absolute_hardness <- (ehomo - elumo) / 2
+  schuurmann_mo_shift_alpha <- alpha
+  
+  # Compute local values
+  # Find indexes for atomic orbitals
+  first_ao <- integer(natoms)
+  last_ao <- integer(natoms)
+  for (iaorb in 1:mopac_aux$naorbitals) {
+    iatom <- mopac_aux$ao_atomindex[iaorb]
+    if (first_ao[iatom] == 0) first_ao[iatom] <- iaorb
+    last_ao[iatom] <- iaorb
+  }
+  # Find indexes for atomic orbitals of heavy atoms
+  first_ao_heavy <- integer(num_heavy_atoms)
+  last_ao_heavy <- integer(num_heavy_atoms)
+  for (iaorb in 1:mopac_aux$naorbitals) {
+    iatom <- mopac_aux$ao_atomindex[iaorb]
+	ihatom <- num_heavy_atom[iatom]
+	if (ihatom > 0) {
+	  if (first_ao_heavy[ihatom] == 0) first_ao_heavy[ihatom] <- iaorb
+	  last_ao_heavy[ihatom] <- iaorb
+	}
+  }
+  # Compute Fukui indexes
+  for (ihatom in 1:num_heavy_atoms) {
+	for (iaorb in first_ao_heavy[ihatom]:last_ao_heavy[ihatom]) {
+      # Compute chomo and clumo
+	  chomo[ihatom] <- chomo[ihatom] + 2 * mopac_aux$eigenvectors[ihomo, iaorb]^2
+	  clumo[ihatom] <- clumo[ihatom] + 2 * mopac_aux$eigenvectors[ilumo, iaorb]^2
+	  # Compute Dn - nucleophilic delocalizabilities
+	  for (ivac in ilumo:mopac_aux$nmorbitals) {
+	    Dn[ihatom] <- Dn[ihatom] + 
+		2 * mopac_aux$eigenvectors[ivac, iaorb]^2 / (alpha - mopac_aux$eigenvalues[ivac])
+	  }
+	  # Compute De - electrophilic delocalizabilities
+	  for (iocc in 1:ihomo) {
+	    De[ihatom] <- De[ihatom] + 
+		2 * mopac_aux$eigenvectors[iocc, iaorb]^2 / (mopac_aux$eigenvalues[iocc] - alpha)
+	  }
+	  # Compute piS - self-polarizabilities
+	  for (iocc in 1:ihomo) {
+	    for (ivac in ilumo:mopac_aux$nmorbitals) {
+		  piS[ihatom] <- piS[ihatom] +
+		  4 * mopac_aux$eigenvectors[ivac, iaorb]^2 * mopac_aux$eigenvectors[iocc, iaorb]^2 /  
+		  (mopac_aux$eigenvalues[ivac] - mopac_aux$eigenvalues[iocc])
+		}
+	  }
+	}
+  }
+
+  list(
+    num_heavy_atoms = num_heavy_atoms,
+	num_heavy_atom = num_heavy_atom,
+	heavy_atom_index = heavy_atom_index,
+	first_ao = first_ao,
+	last_ao = last_ao,
+	first_ao_heavy = first_ao_heavy,
+	last_ao_heavy = last_ao_heavy,
+	ihomo = ihomo,
+	Dn = Dn,
+	De = De,
+	piS = piS,
+	chomo = chomo,
+	clumo = clumo,
+	mulliken_electronegativity = mulliken_electronegativity,
+	parr_pople_absolute_hardness = parr_pople_absolute_hardness,
+	schuurmann_mo_shift_alpha = schuurmann_mo_shift_alpha,
+	ehomo = ehomo,
+	elumo = elumo
+  )
+}
+
+calc_mol_mopac <- function(mol) {
+  write_mopac_input_file(mol, "aaa.mop")
+  run_mopac("aaa.mop")
+  mopac_aux <- read_mopac_aux_file("aaa.aux")
+#  mopac_out <- read_mopac_out_file("aaa.out", mol)
+  mopac_fukui <- calc_fukui(mol, mopac_aux)
+  c(mopac_aux, mopac_fukui)
+}
+
+cmf_calc_mdb_mopac_mem <- function(mdb, print_mopac=TRUE, ...) {
+  mopac_mdb_res <- list()
+  ncomp <- length(mdb)
+  for (imol in 1:ncomp) {
+    mol <- mdb[[imol]]
+	mopac_mol_res <- calc_mol_mopac(mol)
+	mopac_mdb_res[[imol]] <- mopac_mol_res
+	if (print_mopac) {
+	  cat(paste("Structure", imol, "of", ncomp,
+        " natoms =",  mopac_mol_res$natoms,	  
+	    " E(HOMO) =", mopac_mol_res$ehomo, 
+		" E(LUMO) =", mopac_mol_res$elumo, "\n"))
+	  flush.console()
+	}
+  }
+  mopac_mdb_res
+}
+
+cmf_calc_mdb_mopac <- function
+(
+  mdb_fname = "ligands-train.mol2",
+  mopac_res_fname = "ligands-mopac-res-train.RData",
+  ...
+)
+{
+   mdb <- read_mol2(mdb_fname)
+   mopac_mdb_res <- cmf_calc_mdb_mopac_mem(mdb, ...)
+   save(mopac_mdb_res, file=mopac_res_fname)
+}
+
+# Computing kernels based on MOPAC results
+
+cmf_params_mopac <- function(mdb, mopac_mdb_res) {
+  ncomp <- length(mdb)
+  for (imol in 1:ncomp) {
+    mopac_mol_res <- mopac_mdb_res[[imol]]
+    mol <- mdb[[imol]]
+	natoms <- length(mol$atoms)
+#	num_heavy_atom <- integer(natoms)
+#	for (ihatom in 1:length(mopac_mol_res$heavy_atom_index)) {
+#	  num_heavy_atom[mopac_mol_res$heavy_atom_index[ihatom]] <- ihatom
+#	}
+	for (iatom in 1:natoms) {
+	  atom <- mol$atoms[[iatom]]
+	  atom$mop_q <- mopac_mol_res$atom_charges[iatom]
+	  if (mopac_mol_res$num_heavy_atom[iatom]) {
+	    atom$mop_dn   <- mopac_mol_res$Dn[mopac_mol_res$num_heavy_atom[iatom]]
+		atom$mop_de   <- mopac_mol_res$De[mopac_mol_res$num_heavy_atom[iatom]]
+		atom$mop_pis  <- mopac_mol_res$piS[mopac_mol_res$num_heavy_atom[iatom]]
+		atom$mop_homo <- mopac_mol_res$chomo[mopac_mol_res$num_heavy_atom[iatom]]
+		atom$mop_lumo <- mopac_mol_res$clumo[mopac_mol_res$num_heavy_atom[iatom]]
+	  } else {
+	    atom$mop_dn   <- 0
+		atom$mop_de   <- 0
+		atom$mop_pis  <- 0
+		atom$mop_homo <- 0
+		atom$mop_lumo <- 0
+	  }
+	  mdb[[imol]]$atoms[[iatom]] <- atom
+	}
+  }
+  mdb
+}
+
+# Computes MOPAC kernel matrices for the training set and saves it to file
+cmf_comp_mopac_kernels_train <- function
+(
+  train_fname = "ligands-train.mol2",                              # Training set file name
+  mopac_res_fname = "ligands-mopac-res-train.RData",               # File with MOPAC results
+  mopac_kernels_train_fname = "ligands-mopac-kernels-train.RData", # Computed MOPAC kernels file name
+  print_comp_kernels = TRUE,                                       # Verbose computation of kernels
+  ...
+)
+{
+  mdb0 <- read_mol2(train_fname)
+  load(mopac_res_fname)
+  mdb <- cmf_params_mopac(mdb0, mopac_mdb_res)
+  
+  fukui_field_types <- c("mop_dn", "mop_de", "mop_pis", "mop_homo", "mop_lumo")
+  mopac_field_types <- c("mop_q", fukui_field_types)
+
+  kernels <- list()
+  kernels$alphas <- alphas
+
+  for (type in mopac_field_types) {
+    kernels[[type]] <- list()
+  }
+
+  for (ialpha in 1:length(alphas)) {
+    alpha <- alphas[ialpha]
+
+    if (print_comp_kernels) {
+      cat(sprintf("computing MOPAC kernels for alpha=%g\n", alpha))
+      flush.console()
+    }
+    
+	for (type in mopac_field_types) {
+      cat(type)
+      kernels[[type]][[ialpha]] <- cmf_kernel_matrix_tt(type, mdb, alpha, verbose=print_comp_kernels)
+    }
+    
+  }
+  save(kernels, file=mopac_kernels_train_fname) 
+}
+
+# Computes MOPAC kernel matrices for prediction and saves to file
+cmf_comp_mopac_kernels_pred <- function
+(
+  train_fname = "ligands-train.mol2",                            # Training set file name
+  train_mopac_res_fname = "ligands-mopac-res-train.RData",       # File with MOPAC results for the training set
+  pred_fname = "ligands-pred.mol2",                              # Prediction set file name
+  pred_mopac_res_fname = "ligands-mopac-res-pred.RData",         # File with MOPAC results for the test set
+  mopac_kernels_pred_fname = "ligands-mopac-kernels-pred.RData", # Computed kernels file name
+  print_comp_kernels = TRUE,                                     # Verbose computation of kernels
+  ...
+)
+{
+  mdb0_train <- read_mol2(train_fname)
+  mdb0_pred <- read_mol2(pred_fname)
+  load(train_mopac_res_fname)
+  mdb_train <- cmf_params_mopac(mdb0_train, mopac_mdb_res)
+  load(pred_mopac_res_fname)
+  mdb_pred <- cmf_params_mopac(mdb0_pred, mopac_mdb_res)
+
+  fukui_field_types <- c("mop_dn", "mop_de", "mop_pis", "mop_homo", "mop_lumo")
+  mopac_field_types <- c("mop_q", fukui_field_types)
+  
+  kernels_pred <- list()
+  kernels_pred$alphas <- alphas
+
+  for (type in mopac_field_types) {
+    kernels_pred[[type]] <- list()
+  }
+
+  for (ialpha in 1:length(alphas)) {
+    alpha <- alphas[ialpha]
+
+    if (print_comp_kernels) {
+      cat(sprintf("computing MOPAC kernels for alpha=%g\n", alpha))
+      flush.console()
+    }
+    
+    for (type in mopac_field_types) {
+      if (print_comp_kernels) cat(type)
+      kernels_pred[[type]][[ialpha]] <- cmf_kernel_matrix_tp(type, mdb_pred, mdb_train, alpha,  verbose=print_comp_kernels)
+    }
+    
+  }
+  save(kernels_pred, file=mopac_kernels_pred_fname)
+}
+
+# Computes CMF kernel matrices for the combined set of molecules and mopac fields
+cmf_comp_mopac_kernels_all <- function
+(
+  all_fname = "ligands-all.mol2",                              # The name of the file containing all molecules
+  mopac_res_fname = "ligands-mopac-res-all.RData",             # File with MOPAC results
+  mopac_kernels_all_fname = "ligands-mopac-kernels-all.RData", # The name of the files containing kernels for all molecules
+  ...
+)
+{
+  cmf_comp_mopac_kernels_train(
+    train_fname=all_fname, 
+	mopac_res_fname=mopac_res_fname, 
+	mopac_kernels_train_fname=mopac_kernels_all_fname, 
+  ...)
+}
+
+# Generation of grid for MOPAC molecular co-fields
+cmf_gen_grid_mopac <- function
+(
+  train_fname = "ligands-train.mol2",                      # training set file name
+  train_mopac_res_fname = "ligands-mopac-res-train.RData", # File with MOPAC results for the training set
+  kernels_fname = "ligands-kernels.RData",                 # Computed kernels file name
+  model_fname = "ligands-model.RData",                     # Model file name
+  grid_fname = "ligands-grid-krr.RData",                   # Grid with regression coefficients - file name 
+  verbose = TRUE,                                          # Verbose output
+  ...
+)
+{
+  load(kernels_fname)
+  load(model_fname)
+  
+  # Molecular fields
+  mfields <- names(model$h)
+  nfields <- length(mfields)
+
+  mdb0 <- read_mol2(train_fname)
+  load(train_mopac_res_fname)
+  mdb <- cmf_params_mopac(mdb0, mopac_mdb_res)
+
+  grid <- cmf_init_grid(mdb)
+
+  grids <- list()
+  for (f in 1:nfields) {
+    field <- mfields[f]
+    if (verbose) {
+      cat(sprintf("Generating grid for field %s...\n", field))
+      flush.console()
+    }
+    grids[[field]] <- cmf_coef_grid(mdb, model$a, model$alpha[[field]], grid, field)
+  }
+  
+  save(grids, file=grid_fname)
+}
+
+cmf_view_mol_field_cofield_mopac <- function
+(
+  mdb_fname = "ligands-train.mol2",                        # File name for molecular database 
+  train_mopac_res_fname = "ligands-mopac-res-train.RData", # File with MOPAC results for the training set
+  imol = 1,                                                # Molecule to visualize
+  ft = "q",                                                # Field type to visualize
+  grid_fname = "ligands-grid-krr.RData",                   # File name for grid with co-fields
+  alpha_from_model = FALSE,                                # Take alpha from model? (TRUE/FALSE, 1/0)
+  model_fname = "ligands-model.RData",                     # Model file name
+  alpha = 0.3,                                             # Alpha value (if not taken from model)
+  rlevel = 0.5,                                            # Isosurface level
+  alpha_g = 0.7,                                           # Alpha (non-transperancy) level
+  draw_field = TRUE,                                       # Whether to draw field
+  draw_cofield = TRUE,                                     # Whether to draw co-field
+  draw_overlap = FALSE,                                    # Whether to draw overlap between fields and co-fields
+  ...
+)
+{
+  if (alpha_from_model) {
+    load(model_fname)
+    alpha <- model$alpha[[ft]]
+  }
+
+  mdb0 <- read_mol2(train_fname)
+  load(train_mopac_res_fname)
+  mdb <- cmf_params_mopac(mdb0, mopac_mdb_res)
+  mol <- mdb[[imol]]
+  mol_view_cpk(mol)
+  mol_view_cylindres(mol)
+  
+  # Get default colors of physico-chemical fields
+  fcolors <- def_fcolors()
+  if (ft %in% mopac_fields) {
+    # Colors of indixator fields
+    color_p <- "red"
+	color_n <- "blue"
+  } else {
+    # Colors of physico-chemical fields
+    color_p <- fcolors$p[[ft]]
+	color_n <- fcolors$n[[ft]]
+  }
+  
+  # Draw co-field
+  if (draw_cofield) {
+    load(grid_fname)
+    grid_view_rlevel(grids[[ft]], rlevel=rlevel, alpha=alpha_g, color_p=color_p, color_n=color_n, fill=!draw_overlap, ...)
+  }
+  
+  # Draw field
+  if (draw_field) {
+    if (draw_cofield) {
+	  grid_f <- grids[[ft]]
+	} else {
+      grid_f <- cmf_init_grid(mdb, step=1.0)
+	}
+    grid_f[[ft]] <- cmf_fval_grid(ft, mol, alpha, grid_f)
+    grid_view_rlevel(grid_f[[ft]], rlevel=rlevel, alpha=alpha_g, color_p=color_p, color_n=color_n, fill=!draw_cofield, ...)
+  }
+
+  # Draw overlap between fields and co-fields
+  if (draw_overlap) {
+    grid_p <- cmf_multiply_fields(grids[[ft]], grid_f[[ft]])  
+    grid_view_rlevel(grid_p, rlevel=rlevel, alpha=alpha_g, color_p=color_p, color_n=color_n, fill=TRUE, ...)
+  }
+  
+}
+
+#mdb <- read_mol2("ligands-train.mol2")
+#mol <- mdb[[1]]
+#res <- calc_mol_mopac(mol)
