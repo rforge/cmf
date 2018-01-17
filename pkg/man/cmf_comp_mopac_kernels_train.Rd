@@ -61,12 +61,12 @@ cmf_comp_mopac_kernels_train
 
 ## The function is currently defined as
  
-cmf_comp_mopac_kernels_train <- fynction
+cmf_comp_mopac_kernels_train <- function
 (
   train_fname = "ligands-train.mol2",                              # Training set file name
   mopac_res_fname = "ligands-mopac-res-train.RData",               # File with MOPAC results
   mopac_kernels_train_fname = "ligands-mopac-kernels-train.RData", # Computed MOPAC kernels file name
-  print_comp_kernels = TRUE,                                       # Verbose computation of kernels
+  print_comp_kernels = TRUE                                       # Verbose computation of kernels
   
 )
 {

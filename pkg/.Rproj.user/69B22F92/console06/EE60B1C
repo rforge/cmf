@@ -999,3 +999,19 @@ run_mopac <- function(fname)
 read_mopac_aux_file <- function(fname) {
 
   # proceed to next line
+cdc~
+bash: cdc~: command not found
+]0;~/Baskin_Project/cmfeugene-shklyars-macbook-pro:cmf eugeneshklyar$ cd test
+bash: cd: test: No such file or directory
+]0;~/Baskin_Project/cmfeugene-shklyars-macbook-pro:cmf eugeneshklyar$ cd cmf
+bash: cd: cmf: No such file or directory
+]0;~/Baskin_Project/cmfeugene-shklyars-macbook-pro:cmf eugeneshklyar$ cd pkg[K[K[Kpwd
+bash: cd: pwd: No such file or directory
+]0;~/Baskin_Project/cmfeugene-shklyars-macbook-pro:cmf eugeneshklyar$ pwd
+/Users/eugeneshklyar/Baskin_Project/cmf
+]0;~/Baskin_Project/cmfeugene-shklyars-macbook-pro:cmf eugeneshklyar$ cd ;2A~
+bash: 2A~: command not found
+]0;~eugene-shklyars-macbook-pro:~ eugeneshklyar$ cd ~
+]0;~eugene-shklyars-macbook-pro:~ eugeneshklyar$ cd test
+]0;~/testeugene-shklyars-macbook-pro:test eugeneshklyar$ cd cmf
+]0;~/test/cmfeugene-shklyars-macbook-pro:cmf eugeneshklyar$ cd pkg/
