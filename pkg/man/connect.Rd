@@ -4,7 +4,7 @@
 \title{Compute Kier-Hall connectivity topological indices}
 \description{
   Computes Kier-Hall connectivity topological indices:
-  \format{
+  %\format{
     \tabular{ll}{
 	  Chi0V   \tab Chi0V   \cr
 	  Chi1V   \tab Chi1V   \cr
@@ -17,7 +17,7 @@
 	  Chi5pV  \tab Chi5pV  \cr
 	  Chi6pV  \tab Chi6pV
 	}
-  }
+  %}
 }
 \usage{
 connect(moldbase)

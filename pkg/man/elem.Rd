@@ -4,7 +4,7 @@
 \title{Compute descriptors based on elemetal composition}
 \description{
   Computes descriptors based on elemental composition
-  \format{
+  %\format{
     \tabular{ll}{
 	  nC  \tab the number of carbon atoms     \cr
 	  nH  \tab the number of hydrogen atoms   \cr
@@ -18,7 +18,7 @@
 	  nBr \tab the number of bromine atoms    \cr
 	  nI  \tab the number of iodine atoms
 	}
-  }
+  %}
 }
 \usage{
 elem(moldbase)

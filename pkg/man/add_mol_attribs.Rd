@@ -4,7 +4,7 @@
 \title{Add additional attributes to all atoms in all molecules in molecular database}
 \description{
   Additional attributes are computed for all atoms for all molecules in molecular database.
-  \format{
+  %\format{
     \tabular{ll}{
 	  vd_ \tab vertex degree                       \cr
 	  va_ \tab valence                             \cr
@@ -12,7 +12,7 @@
 	  ne_ \tab vector of neighbours                \cr
 	  bo_ \tab vector of bond orders to neighbours 
 	}
-  }
+  %}
 }
 \usage{
 add_mol_attribs(moldbase)
