@@ -1,9 +1,0 @@
-{
-    "path" : "~/test1/cmf/pkg/contmolfields",
-    "sortOrder" : [
-        {
-            "ascending" : true,
-            "columnIndex" : 2
-        }
-    ]
-}
