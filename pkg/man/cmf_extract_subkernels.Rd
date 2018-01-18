@@ -1,15 +1,32 @@
-% File cmf-seal.R
-\name{fr}
-\alias{fr}
+% file cmf-krr.R
+\name{cmf_extract_subkernels}
+\alias{cmf_extract_subkernels}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{fr}
-\description{fr}
+\title{
+%%  ~~function to do ... ~~
+To extract subkernels
+}
+\description{
+%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+To extract subkernels
+}
 \usage{
-fr(par_list)
+cmf_extract_subkernels(kernels, ind_rows, ind_cols, mfields)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{par_list}{}
+  \item{kernels}{
+%%     ~~Describe \code{kernels} here~~
+}
+  \item{ind_rows}{
+%%     ~~Describe \code{ind_rows} here~~
+}
+  \item{ind_cols}{
+%%     ~~Describe \code{ind_cols} here~~
+}
+  \item{mfields}{
+%%     ~~Describe \code{mfields} here~~
+}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -42,8 +59,21 @@ fr(par_list)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (par_list) 
+function (kernels, ind_rows, ind_cols, mfields) 
 {
+    alphas <- kernels$alphas
+    nfields <- length(mfields)
+    subkernels <- list()
+    subkernels$alphas <- alphas
+    for (f in 1:nfields) {
+        field <- mfields[f]
+        subkernels[[field]] <- list()
+        for (ialpha in 1:length(alphas)) {
+            subkernels[[field]][[ialpha]] <- kernels[[field]][[ialpha]][ind_rows, 
+                ind_cols]
+        }
+    }
+    subkernels
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -1073,4 +1073,26 @@ drwxr-xr-x   3 eugeneshklyar  staff   102 Dec 29 07:11 www
 .Rproj.user1		man
 .git			www
 .git1
-]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ 
+]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ ls  -a
+.			.git1
+..			DESCRIPTION
+.RData			NAMESPACE
+.RData1			R
+.Rbuildignore		README
+.Rhistory		cmf.Rproj
+.Rhistory1		conmolfields.Rproj
+.Rproj.user		data
+.Rproj.user1		man
+.git			www
+]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ ls  -a
+.			.git1
+..			DESCRIPTION
+.RData			NAMESPACE
+.RData1			R
+.Rbuildignore		README
+.Rhistory		cmf.Rproj
+.Rhistory1		conmolfields.Rproj
+.Rproj.user		data
+.Rproj.user1		man
+.git			www
+]0;~/test/cmf/pkg[?1034heugene-shklyars-macbook-pro:pkg eugeneshklyar$ 
