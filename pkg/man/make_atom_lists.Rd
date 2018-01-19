@@ -61,12 +61,13 @@ make_atom_lists <- function(ft, mdb) {
     mol <- mdb[[imol]]
 	natoms <- length(mol$atoms)
 	atomlist <- 1:natoms
-	if (ft %in% heavy_atom_fields) {
+	if (ft \%in\% heavy_atom_fields) {
 	  isheavy <- logical(natoms)
 	  for (i in 1:natoms) isheavy[i] <- mol$atoms[[i]]$el != "H"
       atomlist <- atomlist[isheavy]	  
 	}
 
+}
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
