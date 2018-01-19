@@ -60,7 +60,6 @@ cmf_indicator_kernel_matrix(mdb, alpha, syb_type, verbose)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-- mdb[[imol1]]
 cmf_indicator_kernel_matrix <- function(mdb, alpha, syb_type, verbose=1) {
   nmol <- length(mdb)
   gram <- matrix(0, nmol, nmol)
