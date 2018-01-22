@@ -76,7 +76,7 @@ cinf_plot_coverage_mean_error <- function
   cmep_type = "in",  # Coverage - mean error plot type ("in", "out", "diff")
   smoothing = TRUE,  # Whether to draw smoothing curve
   ...
-
+)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
