@@ -1,100 +1,4 @@
 
-	matr
-  }
-  
-  aux_lines <- readLines(fname)
-  nlines <- length(aux_lines)
-  iline <- 0
-  while (iline < nlines) {
-    next_line()
-	
-	# Read scalar values
-	r <-  regexpr("([A-Z_]+):[A-Z/]+=([0-9+-.D]+)$", aline, perl=TRUE)
-	if (r > 0) {
-	  start1 <- attr(r, "capture.start")[1]
-	  stop1 <- start1 + attr(r, "capture.length")[1] - 1
-	  name <- substr(aline, start1, stop1)
-	  start2 <- attr(r, "capture.start")[2]
-	  stop2 <- start2 + attr(r, "capture.length")[2] - 1
-      valstr1 <- substr(aline, start2, stop2)
-	  valstr2 <- sub("D", "E", valstr1)
-	  value <- as.numeric(valstr2)
-	  if (name == "HEAT_OF_FORMATION") {
-	    heat_of_formation <- value
-		next
-	  }
-	  if (name == "TOTAL_ENERGY") {
-	    total_energy <- value
-		next
-	  }
-	  if (name == "DIPOLE") {
-	    dipole <- value
-		next
-	  }
-	}
-	
-	# Read vectors and matrices
-	r <-  regexpr("([A-Z_:]+).([0-9]+).= *$", aline, perl=TRUE)
-	if (r > 0) {
-	  start1 <- attr(r, "capture.start")[1]
-	  stop1 <- start1 + attr(r, "capture.length")[1] - 1
-	  name <- substr(aline, start1, stop1)
-	  start2 <- attr(r, "capture.start")[2]
-	  stop2 <- start2 + attr(r, "capture.length")[2] - 1
-	  count <- as.integer(substr(aline, start2, stop2))
-	  if (name == "ATOM_EL") {
-	    natoms <- count
-		atom_el <- read_strings(count)
-		next
-	  }
-	  if (name == "ATOM_CORE") {
-	    atom_core <- read_integers(count)
-		next
-	  }
-	  if (name == "ATOM_X:ANGSTROMS") {
-	    atom_x <- read_coordinates(natoms)
-		next
-	  }
-	  if (name == "AO_ATOMINDEX") {
-	    naorbitals <- count
-	    ao_atomindex <- read_integers(count)
-		next
-	  }
-	  if (name == "ATOM_SYMTYPE") {
-	    atom_symtype <- read_strings(count)
-		next
-	  }
-	  if (name == "AO_ZETA") {
-	    ao_zeta <- read_reals(count)
-		next
-	  }
-	  if (name == "ATOM_PQN") {
-	    atom_pqn <- read_integers(count)
-		next
-	  }
-	  if (name == "ATOM_X_OPT:ANGSTROMS") {
-	    atom_x_opt <- read_coordinates(natoms)
-		next
-	  }
-	  if (name == "ATOM_CHARGES") {
-	    atom_charges <- read_reals(count)
-		next
-	  }
-	  if (name == "OVERLAP_MATRIX") {
-	    overlap_matrix <- read_lower_half_triangle(naorbitals)
-		next
-	  }
-	  if (name == "EIGENVECTORS") {
-	    nmorbitals <- count / naorbitals
-        eigenvectors <- read_matrix(nmorbitals, naorbitals)
-        next 		
-	  }
-	  if (name == "TOTAL_DENSITY_MATRIX") {
-	    total_density_matrix <- read_lower_half_triangle(naorbitals)
-		next
-	  }
-	  if (name == "EIGENVALUES") {
-	    eigenvalues <- read_reals(count)
 		next
 	  }
 	  if (name == "MOLECULAR_ORBITAL_OCCUPANCIES") {
@@ -1095,4 +999,6 @@ drwxr-xr-x   3 eugeneshklyar  staff   102 Dec 29 07:11 www
 .Rproj.user		data
 .Rproj.user1		man
 .git			www
-]0;~/test/cmf/pkg[?1034heugene-shklyars-macbook-pro:pkg eugeneshklyar$ 
+pwd
+/Users/eugeneshklyar/test/cmf/pkg
+]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ 
