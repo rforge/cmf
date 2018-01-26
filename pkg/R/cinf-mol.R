@@ -83,7 +83,7 @@ substr_mask <- function(mol, mask) {
   substruct(mol, oldnum)
 }
 
-# Computes distance matrix from connection table
+# Computes distance matrix
 calc_distance_matrix <- function(connTable) {
   n <- dim(connTable)[1]
   distMatrix <- matrix(0, n, n)

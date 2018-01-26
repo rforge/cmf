@@ -71,7 +71,10 @@ read_mol2 <- function(filename) {
       atom <- list()
       atom[["el"]] <- el
       atom[["syb"]] <- syb
-      atom[["ch"]] <- 0
+      if (syb == "C.cat" || syb == "N.pl3")
+	    atom[["ch"]] <- 1
+	  else
+	    atom[["ch"]] <- 0
       atom[["nh"]] <- 0
       atom[["pch"]] <- pch
       atom[["x"]] <- x
@@ -92,7 +95,11 @@ read_mol2 <- function(filename) {
         at1 <- as.integer(at1_str)
         at2_str <- substr(bline, starts[3], starts[4]-1)
         at2 <- as.integer(at2_str)
-        bo_str <- substring(bline, starts[4])
+		if (is.na(starts[5])) {
+          bo_str <- substring(bline, starts[4])
+		} else {
+          bo_str <- substring(bline, starts[4], starts[5]-1)	
+		}
         if (any(grep("a", bo_str))) {
           if (any(grep("ar", bo_str))) {
             bo <- 4
@@ -149,6 +156,3 @@ write_mol2 <- function(mdb, fname) {
   close(of)
 }
 
-#mdb <- read_mol2("ligands.mol2")
-#write_mol2(mdb, "ligands2.mol2")
-#mdb2 <- read_mol2("ligands2.mol2")
