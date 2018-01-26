@@ -40,13 +40,12 @@ plot_mlr_model <- function(model) {
 }
 
 #
-# Computes regression parameters: R2, RMSE, MAE
+# Computes regression parameters: R2, RMSE, RMSE_pc, MAE
 # predval - array of predicted values
 # expval - array of experimental values
 #
 regr_param <- function(predval, expval) {
   n <- length(predval)
-  expval_mean <- mean(expval)
   ss <- var(expval) * (n - 1)
   rss <- 0
   rsa <- 0
@@ -56,14 +55,25 @@ regr_param <- function(predval, expval) {
   }
   r2 <- (ss - rss) / ss
   rmse <- sqrt(rss / n)
+  rmse_pc <- 100 * rmse / sd(expval)
   mae <- rsa / n
-  list(R2=r2, RMSE=rmse, MAE=mae)
+  list(R2=r2, RMSE=rmse, RMSE_pc=rmse_pc, MAE=mae)
 }
 
 #
-# Computes sum of squares of deviation from the mean
+# Computes extended set of regression parameters: R2ex
+# predval - array of predicted values
+# expval - array of experimental values
+# trainval - variance of y in training set
 #
-calc_ss <- function(a) {
-  var(a)*(length(a)+1)
+regr_param_ex <- function(predval, expval, trainval) {
+  n_p <- length(predval)
+  rss <- 0
+  for (i in 1:n_p) {
+    rss <- rss + (predval[i] - expval[i]) * (predval[i] - expval[i])
+  }
+  r2ex <- 1 - ((rss/(n_p-1)) / var(trainval))
+  r2ex
 }
+
 
