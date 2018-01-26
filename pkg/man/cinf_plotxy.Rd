@@ -1,21 +1,39 @@
-% File cmf-mopac.R
-
-\name{run_mopac}
-\alias{run_mopac}
+% File cinf-plots.R
+\name{cinf_plotxy}
+\alias{cinf_plotxy}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Run mopac executable
+%%  ~~function to do ... ~~
+Scatter plot
 }
 \description{
-Run mopac executable
+%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Scatter plot
 }
 \usage{
-run_mopac(fname)
+cinf_plotxy <- function(x, y, xlab="Predicted", ylab="Experimental", margin=0.5, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{fname}{}
-  }
+  \item{x}{
+%%     ~~Describe \code{x} here~~
+}
+\item{y}{
+%%     ~~Describe \code{x} here~~
+}
+\item{xlab}{"Predicted"
+%%     ~~Describe \code{x} here~~
+}
+\item{ylab}{"Experimental"
+%%     ~~Describe \code{x} here~~
+}
+\item{margin}{0,5
+%%     ~~Describe \code{x} here~~
+}
+\item{\dots}{
+%%     ~~Describe \code{x} here~~
+}
+}
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
@@ -45,12 +63,17 @@ run_mopac(fname)
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
-## mopac2012.exe has to be localy installed
-## Please refer to http://openmopac.net/MOPAC2012.html for the installation instractions
+
 ## The function is currently defined as
-run_mopac <- function(fname)
-{
-  shell(paste("mopac2012.exe", "aaa.mop"))
+cinf_plotxy <- function(x, y, xlab="Predicted", ylab="Experimental", margin=0.5, ...) {
+  xmin <- min(x)
+  xmax <- max(x)
+  ymin <- min(y)
+  ymax <- max(y)
+  xymin <- min(xmin, ymin) - margin
+  xymax <- max(xmax, ymax) + margin
+  plot(x, y, xlim=c(xymin, xymax), ylim=c(xymin, xymax), xlab=xlab, ylab=ylab, ...)
+  abline(coef=c(0,1))
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
