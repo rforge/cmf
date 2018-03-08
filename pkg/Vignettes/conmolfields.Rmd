@@ -1,0 +1,310 @@
+---
+title: "CMF – R Package Implementing the Continuous Molecular Fields Approach"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Inrtoduction
+
+The package CMF contains a set of R functions that implement the Continuous Molecular Fields (CMF) approach to building 3D-QSAR models. The reference version of the R environment for statistical computing and graphics is 3.0.1.
+
+
+## 2. Installation and Setup of the Required Software
+
+The latest version of the R environment can be downloaded and installed from the homepage of the R Project for Statistical Computing (http://www.r-project.org/). In order to perform visualization of molecules, molecular fields and fields of regression coefficients, it is necessary to install two additional packages: rgl and misc3d. They can be installed from the CRAN homepage (http://cran.r-project.org/). In order to use quantum chemical molecular fields, it is necessary to install the MOPAC12 program (http://openmopac.net/MOPAC2012.html).
+In order to run the software implementing the CMF approach to building 3D-QSAR models, it is necessary to keep all files, including all R scripts and all data files, in the same folder (directory), which should be specified as the current working directory.
+
+## 4. The Basic Workflow for Building 3D-QSAR Models Using the CMF Approach
+
+Two major modes of building and analyzing the performance of 3D-QSAR models are provided. The first one is based on a single splitting between a training set and an external (independent) test set. The model built on the training set is further applied to predict activity values of compounds contained in the test set. This mode requires the use of the following four input files:
+ a file (in the mol2 format) containing 3D structures of the molecules belonging to the training set (its default name is ligands-train.mol2);
+ a file (in the delimited txt format) containing experimental (measured) activity (property) values of the corresponding chemical compounds belonging to the training set (its default name is activity-train.txt);
+ a file (in the mol2 format) containing 3D structures of the molecules belonging to the test set (its default name is ligands-pred.mol2);
+ a file (in the delimited txt format) containing experimental (measured) activity (property) values of the corresponding chemical compounds belonging to the test set (its default name is activity-pred.txt).
+The second mode is based on the procedure of external n-fold cross-validation. In this case the whole set of compounds is split into the training and test sets n times, so each compound appears in a test set exactly once. The 3D-QSAR model built on a training set is applied to the corresponding test set, and all prediction results are accumulated. This mode requires the use of the following two input files:
+ a file (in the mol2 format) containing 3D structures of the molecules belonging to the whole set (its default name is ligands-all.mol2);
+ a file (in the delimited txt format) containing experimental (measured) activity (property) values of the corresponding chemical compounds belonging to the whole set (its default name is activity-all.txt)
+
+## 4.1. Aligning molecules
+
+
+Molecules in a dataset can be aligned using two different approaches. If the set of compounds under study is congeneric, then it can be aligned by least-square fitting (algorithm arun) to a common template substructure, which should be contained in all molecules belonging to this set. Otherwise, alignment can be performed using the seal algorithm.
+If the first approach is chosen, it is first necessary to obtain the template substructure to be used for performing alignment. For example, it can be extracted from some molecule by specifying a list of serial numbers of atoms. This can be accomplished using the script cmf-do-make-template.R, in which the values of the following parameters can be specified:
+ mdb-fname – file name containing the structure from which the template substructure is to be extracted;
+ imol – the serial number of the molecule in the file mdb-fname, from which the template substructure is to be extracted;
+ atom_list – the list of serial numbers of atoms used for extracting the template substructure;
+ template_fname – file name for the template substructure.
+The template substructure can further be used for performing molecular alignment. This can be carried out using the script cmf-do-alignment.R, in which the following parameters can be specified:
+ mdb_fname – file name of the molecular database to be aligned;
+ iimol – List of molecules from mdb_fname to be aligned (if this parameter is dropped, the whole molecular database is to be aligned);
+ templ_fname – file name of the template substructure;
+ mdb_a_fname – file name of the produced aligned database;
+ algorithm – alignment algorithm (in this case, arun).
+
+
+## 4.2. Computing kernels for the training set
+
+The first step in building 3D-QSAR models using the CMF approach is to compute kernels for all pairs of compounds from the training set and to write them to a file. The kernels can be computed for five types of molecular fields:
+ q - electrostatic molecular field;
+ vdw - steric molecular field;
+ logp - hydrophobicity field;
+ abra - hydrogen-bond acidity field;
+ abrb - hydrogen-bond basicity field.
+All kernels are computed for the following fixed set of attenuation parameter αf: 0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0. To carry out this kernel computation procedure, one can run the computational R script cmf-do-comp-kernels-train.R. The values of the following parameters may be specified by editing their default values in the script:
+ train_fname - the name of the mol2 file containing the structures from the training set (default: “ligands-train.mol2”);
+ kernels_train_fname - the name of file with computed kernels (default: “ligands-kernels-train.RData”);
+ mfields – the list of molecular fields for which kernels should be computed (default: c("q","vdw","logp","abra","abrb"));
+ print_comp_kernels – whether to verbose computation of kernels (TRUE/FALSE or 1/0), (default: TRUE)
+4.3. Building 3D-QSAR regression model using the training set
+The second step is to build a 3D-QSAR model and write it to a file. This is performed by running the script cmf-do-krr-train.R, which implements the kernel ridge regression (KRR) algorithm. The values of the following parameters can be specified by changing their default values in this script:
+ act_fname - the name of the text file containing the values of activity for all compounds from the training set (default: "activity-train.txt");
+ act_colnum - activity column number in the file act_fname (default: 2);
+ sep - separator of text fields in the file act_fname containing activity values (default: “,”);
+ kernels_fname - the name of the file containing kernels computed for the training set (default: "ligands-kernels-train.RData");
+ model_fname - the name of the file to which the 3D-QSAR model is written (default: "ligands-model.RData" );
+ alpha_grid_search- whether to perform the grid search for hyper-parameter αf. (TRUE/FALSE) or (1/0) [This option specifies the mode of finding the optimized values of αf (attenuation factor for molecular fields) values. In the first mode, when alpha_grid_search=TRUE, all values of gamma taken from the grid (the fixed set of 0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0) are considered, the value providing the highest Q2 is chosen. In the second mode (alpha_grid_search=FALSE) γ is included in the list of the hyper-parameters subjected to optimization using the Nelder-Mead algorithm. In this case linear interpolation of kernel values is performed.], (default: TRUE);
+ gamma_grid_search - whether to perform the grid search for hyper-parameter gamma (TRUE/FALSE) or (1/0) [This option specifies the mode of finding the optimized values of γ (regularization parameter in KRR) values. In the first mode, when gamma_grid_search=TRUE, all values of gamma taken from the grid (the fixed set of 0.01, 0.05, 0.1, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 10.0, 15.0, 20.0) are considered, the value providing the highest Q2 is chosen. In the second mode (gamma_grid_search=FALSE) γ is included in the list of the hyper-parameters subjected to optimization using the Nelder-Mead algorithm.], (default: FALSE);
+ conic_kernel_combination - whether to form conic kernel combination (with positive mixing coefficients h) (TRUE/FALSE) or (1/0), (default: FALSE);
+ optimize_h - whether to optimize the mixing coefficients h (TRUE/FALSE) or (1/0), (default: FALSE);
+ mfields – the list of molecular fields for which kernels should be computed (default: c("q","vdw","logp","abra","abrb"));
+ set_b_0 – whether to set the offset b=0 (this defines the difference between KRR1 and KRR2 modifications of the KRR method) (TRUE/FALSE) or (1/0), (default: FALSE);
+ print_interm_icv – whether to print intermediate results in the course of optimization (TRUE/FALSE, 1/0), (default: TRUE);
+ plot_interm_icv – whether to produce intermediate scatter plots in the course of optimization (TRUE/FALSE, 1/0), (default: TRUE);
+ print_final_icv – whether to print final results on internal cross-validation (TRUE/FALSE, 1/0), (default: TRUE);
+ plot_final_icv – whether to produce final scatter plot for internal cross-validation (TRUE/FALSE, 1/0), (default: TRUE);
+
+## 4.4. The Use of 3D-QSAR Model for Predicting Activities of Test Set Compounds
+
+Predicting activities of compounds belonging to the external test set is carried out in two steps. In the first step, one should compute kernels comparing molecular fields of all compounds belonging to the test set with molecular fields of all compounds belonging to the training set. To do that, it is necessary to run script cmf-do-comp-kernels-pred.R. The values of the following parameters may be modified in the script:
+ train_fname - the name of the mol2 file containing the structures from the training set (default: “ligands-train.mol2”);
+ pred_fname - the name of the mol2 file containing the structures from the test set (default: “ligands-pred.mol2”);
+ kernels_pred_fname - file name for storing computed kernels (default: “ligands-kernels-pred.mol2”);
+ mfields – the list of molecular fields for which kernels should be computed (default: c("q","vdw","logp","abra","abrb"));
+ print_comp_kernels – whether to verbose computation of kernels (TRUE/FALSE or 1/0), (default: TRUE).
+The second step is to make predictions by running the script cmf-do-krr-pred.R. The results of prediction is written to the file referenced by the variable pred_fname. The values of the following parameters may be modified in the script:
+ model_fname - the name of the file containing 3D-QSAR model (default: "ligands-model.RData");
+ kernels_pred_fname - file name of the file containing kernels that compare molecular fields of molecules belonging to the training and the test sets (computed at the first step) (default: "ligands-kernels-pred.RData");
+ act_colnum - the number of the column with activity values in the file act_pred_fname (If act_colnum=0 then it is assumed that the experimental values of activities are unknown) (default: 2);
+ sep - separator of text fields in the file act_pred_fname containing activity values (if act_colnum > 0) (default “,”);
+ act_pred_fname - the name of the text file containing the values of activity for all compounds from the test set (if act_colnum > 0) (default: "activity-pred.txt");
+ pred_fname - file with predictions (default: "ligands-pred.RData");
+ print_pred – whether to print statistical parameters for prediction (TRUE/FALSE, 1/0), (default: FALSE);
+ plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE).
+
+## 4.5. Building 3D-QSAR models using external n-fold cross-validation
+
+Before building 3D-QSAR models using external n-fold cross-validation, it is necessary to compute kernels for the whole dataset. This can be done using the script cmf-do-comp-kernels-all.R. The following parameters in it can be specified:
+ all_fname - the name of the mol2 file containing the whole set of compounds (default: “ligands-all.mol2”);
+ kernels_all_fname - the name of file with computed kernels (default: “ligands-kernels-all.RData”);
+ mfields – the list of molecular fields for which kernels should be computed (default: c("q","vdw","logp","abra","abrb"));
+ print_comp_kernels – whether to verbose computation of kernels (TRUE/FALSE or 1/0), (default: TRUE)
+After that, in order to perform external n-fold cross-validation, one can launch the script cmf-do-krr-ecv.R, in which the following parameters can be changed:
+ nfolds – the number of folds in cross-validation (default: 5);
+ act_all_fname - the name of the text file containing the values of activity for all compounds from the training set (default: “activity-all.txt”);
+ act_colnum - activity column number in the file act_fname (default: 2);
+ sep - separator of text fields in the file act_fname containing activity values (default: “,”);
+ kernels_all_fname - the name of file with computed kernels (default: “ligands-kernels-all.RData”);
+ mfields – the list of molecular fields for which kernels should be computed (default: c("q","vdw","logp","abra","abrb"));
+ ecv_fname - the name of the file with external cross-validation results (default: “ligands-ecv.RData”);
+ alpha_grid_search- whether to perform the grid search for hyper-parameter αf. (TRUE/FALSE) or (1/0) [This option specifies the mode of finding the optimized values of αf (attenuation factor for molecular fields) values. In the first mode, when
+alpha_grid_search=TRUE, all values of gamma taken from the grid (the fixed set of 0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0) are considered, the value providing the highest Q2 is chosen. In the second mode (alpha_grid_search=FALSE) γ is included in the list of the hyper-parameters subjected to optimization using the Nelder-Mead algorithm. In this case linear interpolation of kernel values is performed.], (default: TRUE);
+ gamma_grid_search - ; whether to perform the grid search for hyper-parameter gamma (TRUE/FALSE) or (1/0) [This option specifies the mode of finding the optimized values of γ (regularization parameter in KRR) values. In the first mode, when gamma_grid_search=TRUE, all values of gamma taken from the grid (the fixed set of 0.01, 0.05, 0.1, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 10.0, 15.0, 20.0) are considered, the value providing the highest Q2 is chosen. In the second mode (gamma_grid_search=FALSE) γ is included in the list of the hyper-parameters subjected to optimization using the Nelder-Mead algorithm], (default: FALSE)
+ conic_kernel_combination - whether to form conic kernel combination (with positive mixing coefficients h) (TRUE/FALSE or 1/0), (default: FALSE);
+ optimize_h - whether to optimize the mixing coefficients h (TRUE/FALSE or 1/0), (default: FALSE);
+ set_b_0 - whether to set the offset b=0 (this defines the difference between KRR1 and KRR2 modifications of the KRR method) (TRUE/FALSE or 1/0), (default: FALSE);
+ print_ecv - print statistical parameters of the external n-folds cross-validation procedure (TRUE/FALSE, 1/0), (default: TRUE);
+ plot_ecv - produce scatter plot for external coss-validation (TRUE/FALSE, 1/0), (default: TRUE);
+ print_interm_icv – whether to print intermediate results in the course of optimization (TRUE/FALSE, 1/0), (default: TRUE);
+ plot_interm_icv – whether to produce intermediate scatter plots in the course of optimization (TRUE/FALSE, 1/0), (default: TRUE);
+ print_final_icv – whether to print final results on internal cross-validation (TRUE/FALSE, 1/0), (default: TRUE);
+ plot_final_icv – whether to produce final scatter plot for internal cross-validation (TRUE/FALSE, 1/0), (default: TRUE);
+ print_pred – whether to print statistical parameters for prediction (TRUE/FALSE, 1/0), (default: FALSE);
+ plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE).
+In order to perform external n-fold cross-validation with reshuffles (random renumbering of molecules), one can launch the script cmf-do-krr-ecvr.R, in which the following parameters can be changed:
+ nfolds – the number of folds in cross-validation (default: 5);
+ act_all_fname - the name of the text file containing the values of activity for all compounds from the training set (default: “activity-all.txt”);
+ act_colnum - activity column number in the file act_fname (default: 2);
+ sep - separator of text fields in the file act_fname containing activity values (default: “,”);
+ kernels_all_fname - the name of file with computed kernels (default: “ligands-kernels-all.RData”);
+ mfields – the list of molecular fields for which kernels should be computed (default: c("q","vdw","logp","abra","abrb"));
+ ecvr_fname - the name of the file with the results of external cross-validation with reshuffles (default: “ligands-ecvr.RData”);
+ alpha_grid_search- whether to perform the grid search for hyper-parameter αf. (TRUE/FALSE) or (1/0) [This option specifies the mode of finding the optimized values of αf (attenuation factor for molecular fields) values. In the first mode, when alpha_grid_search=TRUE, all values of gamma taken from the grid (the fixed set of 0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0) are considered, the value providing the highest Q2 is chosen. In the second mode (alpha_grid_search=FALSE) γ is included in the list of the hyper-parameters subjected to optimization using the Nelder-Mead algorithm. In this case linear interpolation of kernel values is performed.], (default: TRUE);
+ gamma_grid_search - ; whether to perform the grid search for hyper-parameter gamma (TRUE/FALSE) or (1/0) [This option specifies the mode of finding the optimized values of γ (regularization parameter in KRR) values. In the first mode, when gamma_grid_search=TRUE, all values of gamma taken from the grid (the fixed set of 0.01, 0.05, 0.1, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 10.0, 15.0, 20.0) are considered, the value providing the highest Q2 is chosen. In the second mode (gamma_grid_search=FALSE) γ is included in the list of the hyper-parameters subjected to optimization using the Nelder-Mead algorithm], (default: FALSE)
+ conic_kernel_combination - whether to form conic kernel combination (with positive mixing coefficients h) (TRUE/FALSE or 1/0), (default: FALSE);
+ optimize_h - whether to optimize the mixing coefficients h (TRUE/FALSE or 1/0), (default: FALSE);
+ set_b_0 - whether to set the offset b=0 (this defines the difference between KRR1 and KRR2 modifications of the KRR method) (TRUE/FALSE or 1/0), (default: FALSE);
+ seed – seed for random number generator (seed<0 means that seed is not specified)
+ print_ecv - print statistical parameters of the external n-folds cross-validation procedure (TRUE/FALSE, 1/0), (default: TRUE);
+ plot_ecv - produce scatter plot for external coss-validation (TRUE/FALSE, 1/0), (default: TRUE);
+ print_interm_icv – whether to print intermediate results in the course of optimization (TRUE/FALSE, 1/0), (default: TRUE);
+ plot_interm_icv – whether to produce intermediate scatter plots in the course of optimization (TRUE/FALSE, 1/0), (default: TRUE);
+ print_final_icv – whether to print final results on internal cross-validation (TRUE/FALSE, 1/0), (default: TRUE);
+ plot_final_icv – whether to produce final scatter plot for internal cross-validation (TRUE/FALSE, 1/0), (default: TRUE);
+ print_pred – whether to print statistical parameters for prediction (TRUE/FALSE, 1/0), (default: FALSE);
+ plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE).
+Models built for each fold of the external cross-validation with reshuffles procedure and stored in the file with its results can be used for making multiple predictions for an external test set. This can be carried out using the script cmf-do-krr-ecvr-pred.R, in which the following parameters can be changed:
+ ecvr_fname - the name of the file with the results of external cross-validation with reshuffles (default: “ligands-ecvr.RData”);
+ kernels_train_fname - the name of file with computed kernels (default: “ligands-kernels-train.RData”);
+ kernels_pred_fname - file name of the file containing kernels that compare molecular fields of molecules belonging to the training and the test sets (default: “ligands-kernels-pred.RData”);
+ act_colnum - activity column number in the file act_pred_fname; zero value means that the activity is not specified (default: 2);
+ sep – separator of columns in file act_pred_fname (default: “,”);
+ act_pred_fname – file with activity values for the test set (if specified), (default: “activity-pred.txt”).
+ pred_fname - the name of the file containing the results of predictions (default: “ligands-ecvr-pred.mol2”);
+ print_pred – whether to print statistical parameters for prediction (TRUE/FALSE, 1/0), (default: FALSE);
+ plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE).
+Histogram of predicted values for each individual compounds can be visualized using the script cmf-do-ecvr-view-pred.R, in which the following parameters can be changed:
+ pred_fname - the name of the file containing the results of predictions (default: “ligands-ecvr-pred.mol2”);
+ imol – molecule for which predictions should be done.
+
+## 4.6. Producing Scatter Plots
+
+The scripts cmf-do-krr-train.R and cmf-do-krr-pred.R not only build 3D-QSAR models and use them to make predictions, but also produce the corresponding scatter plots. Meanwhile, if it is
+necessary to reproduce these scatter plots, two computational R scripts, cmf-do-plot-cv.R and cmf-do-plot-pred.R, can be used for this purpose.
+The cmf-do-plot-cv.R script produces the scatter plot Predicted/Expetimental for the results of internal cross-validation. The values of the following parameters may be modified in the script:
+ fmodel - the name of the file containing model (default: “ligands-model.RData”);
+ main – the main title (default: “Scatter Plot for Cross-Validation (Internal)”);
+ xlab - text label for axis X (default: “Predicted”);
+ ylab - text label for axis Y (default: “Experimental”);
+ margin - margin for points in all directions (default: 0.5).
+Script cmf-do-plot-pred.R produces scatter plot Predicted/Experimental for the results of predictions performed on external test set. The values of the following parameters may be modified in the script:
+ fpred - the name of the file with predictions (default: “ligands-pred.RData”);
+ main – the main title (default: “Scatter Plot for Prediction”);
+ xlab - text label for axis X (default: “Predicted”);
+ ylab - text label for axis Y (default: “Experimental”);
+ margin - margin for points in all directions (default: 0.5).
+
+## 4.7. Drawing Iso-surfaces for the Fields of Regression Coefficients and their Overlap with Molecular Fields
+
+The fields of regression coefficients can be visualized with the help of iso-surfaces (colored according to the sign of coefficients and the type of molecular field). The procedure for constructing such iso-surfaces includes two stages. In the first stage the values of regression coefficients are calculated on all nodes in an imaginary grid using the R computational script cmf-do-gen-grid.R. All results are written to file. The values of the following parameters may be modified in the script:
+ train_fname - the name of the mol2 file containing the structures from the training set (default: “ligands-train.mol2”);
+ kernels_fname – file with computed kernels (default: "ligands-kernels-train.RData");
+ model_fname - the name of the file with model (default: "ligands-model.RData");
+ grid_fname - the name of the file containing regression coefficients computed at all grid nodes (default: “ligands-grid-krr.RData”).
+At the second stage, iso-surfaces for the fields of regression coefficients (co-fields) are rendered in 3D. For the sake of interpretation, a molecule from the training set is also visualized in the same picture. In order to draw it, one should launch the script cmf-do-view-mol-cofield.R. The values of the following parameters may be modified in the script:
+ mdb_fname - the name of the mol2 file containing the structures from molecular database (default: “ligands-train.mol2”);
+ imol - a molecule to visualize (default: 1);
+ ft - the field type (q/vdw/logp/abra/abrb), (default: “logp”);
+ grid_fname - the name of the file containing model (regression) coefficients computed at all grid nodes (default: “ligands-grid-krr.RData”);
+ rlevel – isosurface level (default: 0.5);
+ alpha - alpha (non-transperancy) level for surfaces in 3D graphics (default: 0.7).
+One can also visualize overlapping fields of regression coefficients (i.e. co-fields) with the corresponding molecular fields. This can be done by running script cmf-do-view-mol-field-cofield.R. One can change the default values of the following parameters in this script:
+ mdb_fname - the name of the mol2 file containing the structures from molecular database (default: “ligands-train.mol2”);
+ imol - a molecule to visualize (default: 1);
+ ft - the field type (q/vdw/logp/abra/abrb), (default: “vdw”);
+ grid_fname - the name of the file containing model (regression) coefficients computed at all grid nodes (default: “ligands-grid-krr.RData”);
+ alpha_from_model – whether to take the attenuation parameter αf from the stored model (TRUE/FALSE or 1/0), (default: TRUE);
+ model_fname – model file name (from which the values of the attenuation parameter αf should be taken whenever alpha_from_model=TRUE), (default: “ligands-model.RData”);
+ alpha – the value of the attenuation parameter αf (default: 1.0);
+ rlevel – isosurface level (for both the fields of regression coefficients and molecular fields), (default: 0.5);
+ alpha_g – non-transperancy level for surfaces (default: 0.5);
+ draw_overlap – whether to visualize the overlap separately with additional iso-surfaces (TRUE/FALSE or 1/0) (default: FALSE).
+Molecular fields without fields of regression coefficients can be visualized using the cmf-do-view-mol-field.R computational R script. Default values of the following parameters can be changed in it:
+ mdb_fname - the name of the mol2 file containing the structures from molecular database (default: “ligands-train.mol2”);
+ imol - a molecule to visualize (default: 1);
+ ft - the field type (q/vdw/logp/abra/abrb), (default: “vdw”);
+ alpha_from_model – whether to take the attenuation parameter αf from the stored model (TRUE/FALSE or 1/0), (default: TRUE);
+ model_fname – model file name (from which the values of the attenuation parameter αf should be taken whenever alpha_from_model=TRUE), (default: “ligands-model.RData”);
+ alpha – the value of the attenuation parameter αf (default: 1.0);
+ rlevel – isosurface level (for both the fields of regression coefficients and molecular fields), (default: 0.5);
+ alpha_g – non-transperancy level for surfaces (default: 0.5.
+
+## 4.8. Analyzing Contributions to Predicted Activity Values
+
+Contributions of different types of molecular fields and different training examples to predicted activity (property) values of compounds belonging to the test set can be calculated using the script cmd-do- anal-contrib-pred.R. The results of the analysis can be read from the variable a. The default values of the following parameters can be changes:
+ model_fname – model file name (default: “ligands-model.RData”);
+ kernels_pred_fname - file name of the file containing kernels that compare molecular fields of molecules belonging to the training and the test sets (default: “ligands-kernels-pred.RData”);
+ act_colnum - activity column number in the file act_pred_fname; zero value means that the activity is not specified (default: 1);
+ sep – separator of columns in file act_pred_fname (default: “,”);
+ act_pred_fname – file with activity values for the test set (if specified), (default: “activity-pred.txt”).
+Contributions of different types of molecular fields and different training examples to predicted activity (property) values of compounds belonging to the training set can be calculated using the script cmd-do-anal-contrib-train.R. The results of the analysis can be read from the variable anal. The default values of the following parameters can be changes:
+ model_fname – model file name (default: “ligands-model.RData”);
+ kernels_fname_train - file name of the file containing kernels for the training set (default: “ligands-kernels-train.RData”);
+ act_colnum - activity column number in the file act_train_fname (default: 2);
+ sep – separator of columns in file act_train_fname (default: “,”);
+ act_train_fname – file with activity values for the training set (default: “activity-train.txt”).
+Contributions of individual atoms to predicted activity (property) values of compounds belonging to the test set can be calculated using the script cmd-do-anal-contrib-atoms-pred.R. The default values of the following parameters can be changes:
+ train_fname – training set file name (default: “ligands-train.mol2”);
+ pred_fname – test set file name (default: “ligands-pred.mol2”);
+ imol – molecule from file pred_fname to be analyzed (default: 1);
+ model_fname – model file name (default: “ligands-model.RData”).
+Contributions of individual atoms to predicted activity (property) values of compounds belonging to the training set can be calculated using the script cmd-do-anal-contrib-atoms-train.R. The default values of the following parameters can be changes:
+ train_fname – training set file name (default: “ligands-train.mol2”);
+ imol – molecule from file train_fname to be analyzed (default: 1);
+ model_fname – model file name (default: “ligands-model.RData”).
+
+## 4.9. Exploring Applicability Domain of 3D-QSAR Models
+
+The package contains several tools for exploring applicability domains of 3D-QSAR model. If the standard deviation of prediction in external cross-validation with reshuffles is chosen as a distance to model parameter and mean prediction is used for computing prediction error, one can produce “coverage – mean error” and “distance to model - error” plots. The first one can be produced by running the cmf-do-ecvr-plot-coverage-mean-error.R script, in which the following default values of parameters can be changed:
+ ecvr_fname - file name for results of external cross-validation with reshuffles (default: ligands-ecvr.RData);
+ cmep_type – the type of the “coverage – mean error” plot ("in" - mean error is calculated inside applicability domain; "out" - mean error is calculated outside applicability domain; "diff" - difference of mean errors outside and inside applicability domain) (default: “in”);
+ smoothing - whether to draw smoothing curve (TRUE/FALSE, 1/0) (default: TRUE).
+The “distance to model - error” plot can be produced by launching the cmf-do ecvr-plot-d2m-eroor.R script, in which the following default values of parameters can be changed:
+ ecvr_fname - file name for results of external cross-validation with reshuffles (default: ligands-ecvr.RData);
+ mean_parts - Whether to calculate mean error values for parts of the points (TRUE/FALSE, 1/0) (default: TRUE);
+ nparts - the number of parts for averaging (default: 3);
+ color_parts - color for drawing mean errors of parts (default: “red”).
+4.10. Working with Quantum Chemical Fields
+The CMF package allows working with molecular fields based on the following local characteristics of atoms:
+ mop_q – Mulliken charges;
+ mop_dn – nulceophilic delocalizabilities;
+ mop_de – electrophilic delocalizabilities;
+ mop_pis – self-polarizabilities;
+ mop_homo – HOMO charge density;
+ mop_lumo – LUMO charge density.
+In order to work with these fields it is necessary to perform quantum chemical calculations for all molecules and save results to file. For the training set, this can be done by running the script cmf-do-comp-mopac-train.R, in which the default values of the following parameters can be changed:
+ mdb_fname – file name of molecular database (default: ligands-train.mol2);
+ mopac_res_fname – file name for the results of quantum chemical calculations (default: ligands-mopac-res-train.RData).
+For the test set and for the whole dataset (training + test sets) one should use the scripts cmf-do-comp-mopac-pred.R and cmf-do-comp-mopac-all.R, respectively.
+In order to compute kernels for the training set, one can run the script cmf-do-comp-mopac-kernels-train.R, in which the default values of the following parameters can be changed:
+ train_fname – training set file name (default: ligands-train.mol2);
+ mopac_res_fname – the name of the file with MOPAC results (default: ligands-mopac-res-train.RData);
+ mopac_kernels_train_fname – file name for computed kernels (default: ligands-mopac-kernels-train.RData);
+ print_comp_kernels – whether to verbose computation of kernels (TRUE/FALSE or 1/0), (default: TRUE).
+For the test set and for the whole dataset (training + test sets) one should use the scripts cmf-do-comp-mopac-kernels-pred.R and cmf-do-comp-mopac-kernels-all.R, respectively.
+While working with the molecular fields computed with the help of the MOPAC2012 program, one can use:
+ cmf-do-krr-train-mopac.R instead of cmf-do-krr-train.R for building models;
+ cmf-do-krr-pred-mopac.R instead of cmf-do-krr-pred.R for making predictions on external database;
+ cmf-do-krr-ecv-mopac.R instead of cmf-do-krr-ecv.R for performing external crass-validation study;
+ cmf-do-krr-ecvr-mopac.R instead of cmf-do-krr-ecvr.R for performing external crass-validation study with multiple reshuffles;
+ cmf-do-view-mol-field-cofield-mopac.R instead of cmf-do-view-mol-field-cofield.R for visualizing molecular fields and co-fields.
+
+## 4.11. Working with Indicator Fields
+
+The CMF package allows working with indicator fields which indicate the presence of some type at a given point in the space. In the current implementation, the types of atoms are defined in accordance with classification in the Tripos force field. The list of indicator fields is based on the occurrences of different types of atoms in the working dataset. One can control the composition of this list by changing default values of parameters min_occ, good_list and bad_list.
+In order to compute kernels based on the indicator fields for the training set, one can run the script cmf-do-comp-ind-kernels-train.R, in which the default values of the following parameters can be changed:
+ train_fname – training set file name (default: ligands-train.mol2);
+ ind_kernels_train_fname – file name for computed kernels (default: ligands-ind-kernels-train.RData);
+ print_comp_kernels – whether to verbose computation of kernels (TRUE/FALSE or 1/0), (default: TRUE).
+For the test set and for the whole dataset (training + test sets) one should use the scripts cmf-do-comp-ind-kernels-pred.R and cmf-do-comp-ind-kernels-all.R, respectively.
+While working with indicator fields, one can use:
+ cmf-do-krr-train-ind.R instead of cmf-do-krr-train.R for building models;
+ cmf-do-krr-pred-ind.R instead of cmf-do-krr-pred.R for making predictions on external database;
+ cmf-do-krr-ecv-ind.R instead of cmf-do-krr-ecv.R for performing external crass-validation study;
+ cmf-do-krr-ecvr-ind.R instead of cmf-do-krr-ecvr.R for performing external crass-validation study with multiple reshuffles;
+ cmf-do-gen-grid-ind.R and cmf-do-gen-grid-ind-ex.R instead of cmf-do-gen-grid.R for generating values of the co-field of regression coefficients at grid nodes – this is needed in order to visualize the fields of regression (model) coefficients (co-fields).
+ cmf-do-view-mol-field-cofield-ind.R instead of cmf-do-view-mol-field-cofield.R for visualizing molecular fields and co-fields;
+ cmf-do-anal-contrib-atoms-train-ind.R instead of cmf-do-anal-contrib-atoms-train.R for analyzing contributions of different atoms to predicted activity values for the training set;
+ cmf-do-anal-contrib-atoms-pred-ind.R instead of cmf-do-anal-contrib-atoms-pred.R for analyzing contributions of different atoms to predicted activity values for the test set;
+ cmf-do-anal-contrib-train-ind.R instead of cmf-do-anal-contrib-train.R for analyzing contributions of different kinds of indicator fields and training examples to predicted activity values for the training set;
+ cmf-do-anal-contrib-pred-ind.R instead of cmf-do-anal-contrib-pred.R for analyzing contributions of different kinds of indicator fields and training examples to predicted activity values for the test set.
+In scripts cmf-do-krr-train-ind.R, cmf-do-krr-ecv-ind.R and cmf-do-krr-ecvr-ind.R default values of the following additional parameters can be changed:
+ min_occ – minimal occurrence of atom types used to define indicator fields (default: 7);
+ good_list – “good” list of atom types which should be used to define indicator fields (default: NULL);
+ bad_list – “bad” list of atom types which should not be used for defining indicator fields (default: NULL).
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

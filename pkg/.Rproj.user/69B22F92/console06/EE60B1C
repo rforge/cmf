@@ -1,45 +1,4 @@
 
-	  if (name == "MOLECULAR_ORBITAL_OCCUPANCIES") {
-	    molecular_orbital_occupancies <- read_reals(count)
-		next
-	  }
-	}
-  }
-  list(
-    natoms = natoms,
-	naorbitals = naorbitals,
-	nmorbitals = nmorbitals,
-    atom_el = atom_el, 
-	atom_core = atom_core, 
-	atom_x = atom_x, 
-	ao_atomindex = ao_atomindex,
-	atom_symtype = atom_symtype,
-	ao_zeta = ao_zeta,
-	atom_pqn = atom_pqn,
-	atom_x_opt = atom_x_opt,
-	atom_charges = atom_charges,
-	overlap_matrix = overlap_matrix,
-	eigenvectors = eigenvectors,
-	total_density_matrix = total_density_matrix,
-	eigenvalues = eigenvalues,
-	molecular_orbital_occupancies = molecular_orbital_occupancies,
-	heat_of_formation = heat_of_formation,
-	total_energy = total_energy,
-	dipole = dipole
-  )
-}
-
-read_mopac_out_file <- function(fname, mol) {
- 
-  # proceed to next line
-  next_line <- function() {
-    iline <<- iline + 1
-	aline <<- arc_lines[iline]
-  }
-  
-  get_num_heavy_atoms <- function(mol) {
-	iheavy <- 0	
-	for (atom in mol$atoms) {
 	  if (atom$el != "H") iheavy <- iheavy + 1
 	}
 	return(iheavy)
@@ -1040,4 +999,4 @@ bash: syntax error near unexpected token `('
 ]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ pwdR source("~/test/cmf-ddo-comp-kernels-all.R")[1P)')[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C~/test/cmf-do[1P-comp-kernels-all.R')[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C'~/test/cmf-do-comp-kernels-all.R')[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
 
 bash: syntax error near unexpected token `('
-]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ 
+]0;~/test/cmf/pkg[?1034heugene-shklyars-macbook-pro:pkg eugeneshklyar$ 
