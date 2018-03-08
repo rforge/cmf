@@ -7,4 +7,7 @@ Authors@R: c(person("Igor", "Baskin", role = c("aut","cre" ),
                     email = "shklyar.eugene@gmail.com"))
 Description: The package implements the continuous molecular fields(CMF) approach to building 3D-QSAR models.
 License: GPL (>= 2)
-Suggests: testthat
+Suggests: testthat, knitr, VignetteBuilder
+
+
+
