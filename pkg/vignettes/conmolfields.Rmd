@@ -45,7 +45,40 @@ If the first approach is chosen, it is first necessary to obtain the template su
 - atom_list – the list of serial numbers of atoms used for extracting the template substructure;
 - template_fname – file name for the template substructure.
 
-The template substructure can further be used for performing molecular alignment. This can be carried out using the script cmf-do-alignment.R, in which the following parameters can be specified:
+The template substructure can further be used for performing molecular alignment. This can be carried out using the following script:
+
+```
+# File name of molecular databased to be aligned
+mdb_fname <- "ligands-train.mol2"
+
+# Molecules from mdb_fname to be aligned
+iimol <- c(1:72)
+
+# File name of template
+templ_fname <- "ligands-template.mol2"
+
+# File name for aligned database
+mdb_a_fname <- "ligands-aligned.mol2"
+
+# Algorithm (arun/seal)
+algorithm <- "arun"
+
+mdb <- read_mol2(mdb_fname)
+mdb_tmp <- read_mol2(templ_fname)
+templ <- mdb_tmp[[1]]
+if (algorithm == "arun") {
+  mdb_a <- align_mdb_template(mdb, templ)
+#  mdb_a <- align_mdb_template(mdb, templ, iimol)
+} else if (algorithm == "seal") {
+  mdb_a <- align_mdb_seal(mdb, templ)
+} else {
+  cat("Unknown algorithm\n")
+}
+write_mol2(mdb_a, mdb_a_fname)
+
+```
+
+in which the following parameters can be specified:
 
 - mdb_fname – file name of the molecular database to be aligned;
 - iimol – List of molecules from mdb_fname to be aligned (if this parameter is dropped, the whole molecular database is to be aligned);
