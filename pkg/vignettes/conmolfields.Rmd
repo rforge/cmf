@@ -77,7 +77,6 @@ if (algorithm == "arun") {
 write_mol2(mdb_a, mdb_a_fname)
 
 ```
-
 in which the following parameters can be specified:
 
 - mdb_fname – file name of the molecular database to be aligned;
@@ -85,4 +84,45 @@ in which the following parameters can be specified:
 - templ_fname – file name of the template substructure;
 - mdb_a_fname – file name of the produced aligned database;
 - algorithm – alignment algorithm (in this case, arun).
+
+## 4.2. Computing kernels for the training set
+
+The first step in building 3D-QSAR models using the CMF approach is to compute kernels for all pairs of compounds from the training set and to write them to a file. The kernels can be computed for five types of molecular fields:
+
+- q - electrostatic molecular field;
+- vdw - steric molecular field;
+- logp - hydrophobicity field;
+- abra - hydrogen-bond acidity field;
+- abrb - hydrogen-bond basicity field.
+
+
+All kernels are computed for the following fixed set of attenuation parameter: 0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0.
+To carry out this kernel computation procedure, one can run the computational R script:
+
+```
+# Training set file name
+train_fname <- "ligands-train.mol2"
+
+# The name of the file with kernels for training
+kernels_train_fname <- "ligands-kernels-train.RData"
+
+# Molecular fields
+mfields <- c("q","vdw","logp","abra","abrb")
+
+# Verbose computation of kernels (TRUE/FALSE, 1/0)
+print_comp_kernels <- TRUE
+
+comp_kernels_train(
+  train_fname = train_fname, 
+  kernels_train_fname = kernels_train_fname, 
+  mfields = mfields, 
+  print_comp_kernels = print_comp_kernels
+)
+```
+
+The values of the following parameters may be specified by editing their default values in the script:
+
+- train_fname - the name of the mol2 file containing the structures from the training set (default: “ligands-train.mol2”);
+- kernels_train_fname - the name of file with computed kernels (default: “ligands-kernels-train.RData”);
+- mfields – the list of molecular fields for which kernels should be computed (default: c("q","vdw","logp","abra","abrb"));
 
