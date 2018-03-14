@@ -633,4 +633,412 @@ in which the following parameters can be changed:
 (default: “ligands-ecvr-pred.mol2”);
 - imol – molecule for which predictions should be done.
 
+## 4.6. Producing Scatter Plots
+
+The scripts
+
+```
+# KRR with continuous molecular fields and optimization of  gamma and h.
+# alpha is optimized by grid search
+# Any combination of molecular fields is supported
+
+# Activity file name
+act_train_fname <- "activity-train.txt"
+
+# Activity column number
+act_colnum <- 1
+
+# Separator
+sep <- ","
+
+# Kernels file name    
+kernels_train_fname <- "ligands-kernels-train.RData"
+
+# Model file name
+model_fname <- "ligands-model.RData"
+
+# Types of molecular fields
+mfields <- c("q","vdw","logp","abra","abrb")
+
+# Whether to perform grid search for attenuation factor alpha (TRUE/FALSE, 1/0).
+alpha_grid_search <- TRUE
+
+# Whether to perform grid search for Tikhonov regularization coefficient gamma (TRUE/FALSE, 1/0).
+gamma_grid_search <- FALSE
+
+# Whether to form tconic kernel combination 
+conic_kernel_combination <- FALSE
+
+# Whether to optimize h (TRUE/FALSE, 1/0)
+optimize_h <- FALSE
+
+# Whether to set b=0 (TRUE/FALSE, 1/0)
+set_b_0 <- FALSE
+
+# Print intermediate results in the course of optimiization (TRUE/FALSE, 1/0) 
+print_interm_icv <- TRUE                   
+
+# Produce intermediate scatter plots in the course of optimization  (TRUE/FALSE, 1/0)
+plot_interm_icv <- TRUE                   
+
+# Print final results on interna; cross-validation (TRUE/FALSE, 1/0)
+print_final_icv <- TRUE
+
+# Produce final scatter plot for internal cross-valudation (TRUE/FALSE, 1/0)                     
+plot_final_icv <- TRUE                       
+
+cmf_krr_train(
+  act_train_fname = act_train_fname, 
+  act_colnum = act_colnum, 
+  sep = sep, 
+  kernels_train_fname = kernels_train_fname, 
+  model_fname = model_fname, 
+  mfields = mfields, 
+  alpha_grid_search = alpha_grid_search,
+  gamma_grid_search = gamma_grid_search, 
+  conic_kernel_combination = conic_kernel_combination, 
+  optimize_h = optimize_h, 
+  set_b_0 = set_b_0,
+  print_interm_icv = print_interm_icv,
+  plot_interm_icv = plot_interm_icv,
+  print_final_icv = print_final_icv,
+  plot_final_icv = plot_final_icv
+)
+
+```
+
+and 
+
+```
+
+# Model file name
+model_fname <- "ligands-model.RData"
+
+# Kernels for training file name
+kernels_train_fname <- "ligands-kernels-train.RData"
+
+# Kernels for prediction file name
+kernels_pred_fname <- "ligands-kernels-pred.RData"
+
+# Column name or activity (if specified)
+act_colnum <- 1
+
+# Separator
+sep <- ","
+
+# Activity for prediction set (if specified)
+act_pred_fname <- "activity-pred.txt"
+
+# File with predictions
+pred_fname <- "ligands-pred.RData"
+
+# Print statistical parameters for prediction (TRUE/FALSE, 1/0)
+print_pred <- TRUE
+
+# Produce scatter plot prediction on external database (TRUE/FALSE, 1/0)
+plot_pred <- TRUE    
+
+res <- cmf_krr_pred(
+  model_fname = model_fname, 
+  kernels_train_fname = kernels_train_fname,
+  kernels_pred_fname = kernels_pred_fname, 
+  act_colnum = act_colnum, 
+  sep = sep, 
+  act_pred_fname = act_pred_fname,
+  pred_fname = pred_fname,
+  print_pred = print_pred,
+  plot_pred = plot_pred
+)
+
+```
+
+not only build 3D-QSAR models and use them to make predictions, but also produce the corresponding scatter plots. Meanwhile, if it is
+necessary to reproduce these scatter plots, two computational R scripts 
+can be used for this purpose: 
+
+The below script produces the scatter plot Predicted/Expetimental for the results of internal cross-validation. The values of the following parameters may be modified in the script:
+
+- fmodel - the name of the file containing model (default: “ligands-model.RData”);
+- main – the main title (default: “Scatter Plot for Cross-Validation (Internal)”);
+- xlab - text label for axis X (default: “Predicted”);
+- ylab - text label for axis Y (default: “Experimental”);
+- margin - margin for points in all directions (default: 0.5).
+
+```
+# Script for drawing scatter plot for cross-validation results
+
+
+# File with model
+fmodel <- "ligands-model.RData"
+
+# Main title
+main <- "Scatter Plot for Cross-Validation (Internal)"
+
+# Label for axis X
+xlab <- "Predicted"
+
+# Label for axis Y
+ylab <- "Experimental"
+
+# Margin for points in all directions
+margin <- 0.5
+
+load(fmodel)
+
+cinf_plotxy(
+  model$y_pred_cv, 
+  model$y_exp, 
+  xlab = xlab, 
+  ylab = ylab, 
+  margin = margin,
+  main = main
+)
+
+```
+
+and
+
+The below script produces scatter plot Predicted/Experimental for the results of predictions performed on external test set. The values of the following parameters may be modified in the script:
+
+- fpred - the name of the file with predictions (default: “ligands-pred.RData”);
+- main – the main title (default: “Scatter Plot for Prediction”);
+- xlab - text label for axis X (default: “Predicted”);
+- ylab - text label for axis Y (default: “Experimental”);
+- margin - margin for points in all directions (default: 0.5)
+
+```
+# Script for drawing scatter plot for predicting test set
+
+
+# File with predictions
+fpred <- "ligands-pred.RData"
+
+# Main title
+main <- "Scatter Plot for Prediction"
+
+# Label for axis X
+xlab <- "Predicted"
+
+# Label for axis Y
+ylab <- "Experimental"
+
+# Margin for points in all directions
+margin <- 0.5
+
+load(fpred)
+cinf_plotxy(
+  pred$y_pred, 
+  pred$y_exp, 
+  xlab=xlab, 
+  ylab=ylab, 
+  margin=margin, 
+  main=main
+)
+
+```
+
+## 4.7. Drawing Iso-surfaces for the Fields of Regression Coefficients and their Overlap with Molecular Fields
+
+The fields of regression coefficients can be visualized with the help of iso-surfaces (colored according to the sign of coefficients and the type of molecular field). The procedure for constructing such iso-surfaces includes two stages. In the first stage the values of regression coefficients are calculated on all nodes in an imaginary grid using the R computational script:
+
+```
+# Generation of grid for continuous molecular co-fields
+
+# Training set file name
+train_fname <- "ligands-train.mol2"
+
+# Computed kernels file name
+kernels_fname <- "ligands-kernels-train.RData"
+
+# Model file name
+model_fname <- "ligands-model.RData"
+
+# Grid with regression coefficients file name
+grid_fname <- "ligands-grid-krr.RData" 
+
+cmf_gen_grid(
+  train_fname = train_fname, 
+  kernels_fname = kernels_fname, 
+  model_fname = model_fname, 
+  grid_fname = grid_fname
+)
+
+```
+
+All results are written to file. The values of the following parameters may be modified in the script:
+
+- train_fname - the name of the mol2 file containing the structures from the training set (default: “ligands-train.mol2”);
+- kernels_fname – file with computed kernels (default: "ligands-kernels-train.RData");
+- model_fname - the name of the file with model (default: "ligands-model.RData");
+- grid_fname - the name of the file containing regression coefficients computed at all grid nodes (default: “ligands-grid-krr.RData”).
+At the second stage, iso-surfaces for the fields of regression coefficients (co-fields) are rendered in 3D. For the sake of interpretation, a molecule from the training set is also visualized in the same picture. In order to draw it, one should launch the script: 
+
+```
+# View molecule with co-field
+
+
+# Molecular database file name
+mdb_fname <- "ligands-train.mol2"
+
+# Molecule to visualize
+imol <- 1
+
+# Field type 
+ft <- "vdw"
+
+# Grid with model coefficients file name
+grid_fname <- "ligands-grid-krr.RData" 
+
+# Isosurface level
+rlevel <- 0.5
+
+# Alpha (non-transperancy) level
+alpha_g <- 0.7
+
+cmf_view_mol_field_cofield(
+  mdb_fname = mdb_fname, 
+  imol = imol, 
+  ft = ft, 
+  grid_fname = grid_fname, 
+  rlevel = rlevel, 
+  alpha_g = alpha_g,
+  draw_field = FALSE,
+  draw_cofield = TRUE
+)
+
+```
+
+The values of the following parameters may be modified in the script:
+
+- mdb_fname - the name of the mol2 file containing the structures from molecular database (default: “ligands-train.mol2”);
+- imol - a molecule to visualize (default: 1);
+- ft - the field type (q/vdw/logp/abra/abrb), (default: “logp”);
+- grid_fname - the name of the file containing model (regression) coefficients computed at all grid nodes (default: “ligands-grid-krr.RData”);
+- rlevel – isosurface level (default: 0.5);
+- alpha - alpha (non-transperancy) level for surfaces in 3D graphics (default: 0.7).
+One can also visualize overlapping fields of regression coefficients (i.e. co-fields) with the corresponding molecular fields. This can be done by running script: 
+
+```
+# View overlapping fields of regression coefficients and molecular fields
+
+# Molecular database file name
+mdb_fname <- "ligands-train.mol2"
+
+# Molecule to visualize
+imol <- 1
+
+# Field type 
+ft <- "vdw"
+
+# Grid with regression coefficients file name
+grid_fname <- "ligands-grid-krr.RData" 
+
+# Take alpha from model? (TRUE/FALSE)
+alpha_from_model <- TRUE
+
+# Model file name
+model_fname <- "ligands-model.RData"
+
+# Alpha value (if not taken from model)
+alpha <- 1.0
+
+# Isosurface level
+rlevel <- 0.5
+
+# Alpha (non-transperancy) level
+alpha_g <- 0.5
+
+# Whether to draw overlap between field and co-field
+draw_overlap <- TRUE
+
+cmf_view_mol_field_cofield(
+  mdb_fname = mdb_fname, 
+  imol = imol, 
+  ft = ft, 
+  grid_fname = grid_fname, 
+  alpha_from_model = alpha_from_model, 
+  model_fname = model_fname, 
+  alpha = alpha, 
+  rlevel = rlevel, 
+  alpha_g = alpha_g,
+  draw_field = TRUE,
+  draw_cofield = TRUE,
+  draw_overlap = draw_overlap
+)
+
+
+```
+
+One can change the default values of the following parameters in
+this script:
+
+- mdb_fname - the name of the mol2 file containing the structures from molecular database (default: “ligands-train.mol2”);
+- imol - a molecule to visualize (default: 1);
+- ft - the field type (q/vdw/logp/abra/abrb), (default: “vdw”);
+- grid_fname - the name of the file containing model (regression) coefficients computed at all - - grid nodes (default: “ligands-grid-krr.RData”);
+- alpha_from_model – whether to take the attenuation parameter $\alpha$f from the stored model (TRUE/FALSE or 1/0), (default: TRUE);
+- model_fname – model file name (from which the values of the attenuation parameter $\alpha$f should be taken whenever alpha_from_model=TRUE), (default: “ligands-model.RData”);
+- alpha – the value of the attenuation parameter $\alpha$f (default: 1.0);
+- rlevel – isosurface level (for both the fields of regression coefficients and molecular fields), (default: 0.5);
+- alpha_g – non-transperancy level for surfaces (default: 0.5);
+- draw_overlap – whether to visualize the overlap separately with additional iso-surfaces (TRUE/FALSE or 1/0) (default: FALSE).
+
+Molecular fields without fields of regression coefficients can be visualized using the below computational R script:
+
+```
+# View overlapping fields of regression coefficients and molecular fields
+
+# Molecular database file name
+mdb_fname <- "ligands-train.mol2"
+
+# Molecule to visualize
+imol <- 1
+
+# Field type 
+ft <- "vdw"
+
+# Take alpha from model? (TRUE/FALSE)
+alpha_from_model <- TRUE
+
+# Model file name
+model_fname <- "ligands-model.RData"
+
+# Alpha value (if not taken from model)
+alpha <- 1.0
+
+# Isosurface level
+rlevel <- 0.5
+
+# Alpha (non-transperancy) level
+alpha_g <- 0.5
+
+cmf_view_mol_field_cofield(
+  mdb_fname = mdb_fname, 
+  imol = imol, 
+  ft = ft, 
+  grid_fname = grid_fname, 
+  alpha_from_model = alpha_from_model, 
+  model_fname = model_fname, 
+  alpha = alpha, 
+  rlevel = rlevel, 
+  alpha_g = alpha_g,
+  draw_field = TRUE,
+  draw_cofield = FALSE
+)
+
+
+```
+
+Default values of the following parameters can be changed in it:
+
+- mdb_fname - the name of the mol2 file containing the structures from molecular database (default: “ligands-train.mol2”);
+- imol - a molecule to visualize (default: 1);
+- ft - the field type (q/vdw/logp/abra/abrb), (default: “vdw”);
+- alpha_from_model – whether to take the attenuation parameter $\alpha$f  from the stored model (TRUE/FALSE or 1/0), (default: TRUE);
+- model_fname – model file name (from which the values of the attenuation parameter $\alpha$f should be taken whenever alpha_from_model=TRUE), (default: “ligands-model.RData”);
+- alpha – the value of the attenuation parameter $\alpha$f (default: 1.0);
+- rlevel – isosurface level (for both the fields of regression coefficients and molecular fields), (default: 0.5);
+- alpha_g – non-transperancy level for surfaces (default: 0.5.
+
+
 

@@ -1,78 +1,4 @@
 
-	  if (atom$el != "H") iheavy <- iheavy + 1
-	}
-	return(iheavy)
-  }
-  
-  arc_lines <- readLines(fname)
-  nlines <- length(arc_lines)
-  iline <- 0
-  
-  # Skip to superdelocalizabilities
-  while (iline < nlines) {
-    next_line()
-    r <- regexpr("           SUPERDELOCALIZABILITIES", aline)
-	if (r > 0) break
-  }
-  
-  # Read several scalar values
-  next_line()
-  next_line()
-  mulliken_electronegativity <- as.numeric(substr(aline, 34, 44))
-  next_line()
-  parr_pople_absolute_hardness <- as.numeric(substr(aline, 34, 44))
-  next_line()
-  schuurmann_mo_shift_alpha <- as.numeric(substr(aline, 34, 44))
-  next_line()
-  next_line()
-  ehomo <- as.numeric(substr(aline, 34, 44))
-  next_line()
-  elumo <- as.numeric(substr(aline, 34, 44))
-  for (i in 1:4) next_line()
-  
-  # Read arrays with superdelocalizabilities
-  num_heavy_atoms <- get_num_heavy_atoms(mol)
-  heavy_atom_index <- integer(num_heavy_atoms)
-  Dn <- double(num_heavy_atoms)
-  De <- double(num_heavy_atoms)
-  qZ <- double(num_heavy_atoms)
-  piS <- double(num_heavy_atoms)
-  chomo <- double(num_heavy_atoms)
-  clumo <- double(num_heavy_atoms)
-  # Read Dn(r), De(r) and q(r)-Z(r)
-  for (i in 1:num_heavy_atoms) {
-    next_line()
-    heavy_atom_index[i] <- as.integer(substr(aline, 5, 7))
-	Dn[i] <- as.numeric(substr(aline, 11, 20))
-	De[i] <- as.numeric(substr(aline, 24, 33))
-	qZ[i] <- as.numeric(substr(aline, 37, 46))
-  }
-  for (i in 1:5) next_line()
-  # Read piS
-  for (i in 1:num_heavy_atoms) {
-    next_line()
-	piS[i] <- as.numeric(substr(aline, 11, 20))
-  }
-  for (i in 1:5) next_line()
-  # Read homo and lumo
-  for (i in 1:num_heavy_atoms) {
-    next_line()
-	chomo[i] <- as.numeric(substr(aline, 24, 33))
-	clumo[i] <- as.numeric(substr(aline, 37, 46))
-  }
-  
-  list(
-    num_heavy_atoms = num_heavy_atoms,
-	heavy_atom_index = heavy_atom_index,
-	Dn = Dn,
-	De = De,
-	qZ = qZ,
-	piS = piS,
-	chomo = chomo,
-	clumo = clumo,
-	mulliken_electronegativity = mulliken_electronegativity,
-	parr_pople_absolute_hardness = parr_pople_absolute_hardness,
-	schuurmann_mo_shift_alpha = schuurmann_mo_shift_alpha,
 	ehomo = ehomo,
 	elumo = elumo
   )
@@ -999,3 +925,80 @@ bash: syntax error near unexpected token `('
 ]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ pwdR source("~/test/cmf-ddo-comp-kernels-all.R")[1P)')[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C~/test/cmf-do[1P-comp-kernels-all.R')[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C'~/test/cmf-do-comp-kernels-all.R')[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
 
 bash: syntax error near unexpected token `('
+]0;~/test/cmf/pkg[?1034heugene-shklyars-macbook-pro:pkg eugeneshklyar$ [Keugene-shklyars-macbook-pro:pkg eugeneshklyar$ R "source("~/Baskin_Project/cmf/cmf-do-plot-cv.R")
+> 
+]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ pwd
+/Users/eugeneshklyar/test/cmf/pkg
+]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ pwdR "source("~/Baskin_Project/cmf/cmf-do-plot-cv.R")
+ echo 891F67E3 && /usr/bin/env && echo BDC824D6[C[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1Psource("~/Baskin_Project/cmf/cmf-do-plot-cv.R")[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+[A
+bash: syntax error near unexpected token `('
+]0;~/test/cmf/pkg]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ R source("~/Baskin_Project/cmf/cmf-do-plot-cv.R")
+bash: syntax error near unexpected token `('
+]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ R
+
+R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[1m[Previously saved workspace restored]
+
+[0m[?1034h> The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit**, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in tthe editor is displayed.[A[A[C[CWhen you save the notebook, an HTML file containing the code and output will be saved alongside it (c[26Plick the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[A[C[C[1PAdd a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C```[K[K[K[Ksource("~/Baskin_Project/cmf/cmf-do-plot-cv.R")
+[1mError in file(filename, "r", encoding = encoding) : 
+  cannot open the connection
+[0m[1mIn addition: [0m[1mWarning message:
+[0m[1mIn file(filename, "r", encoding = encoding) :[0m[1m
+ [0m[1m cannot open file 'cinf-plots.R': No such file or directory
+[0m> quit()
+Save workspace image? [y/n/c]: n
+]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ pw
+dbash: pw: command not found
+]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ d[Kpwd
+/Users/eugeneshklyar/test/cmf/pkg
+]0;~/test/cmf/pkgeugene-shklyars-macbook-pro:pkg eugeneshklyar$ cd ~/Baskin_Project/cmf
+]0;~/Baskin_Project/cmfeugene-shklyars-macbook-pro:cmf eugeneshklyar$ source("~/Baskin_Project/cmf/cmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")Rsource("cmf-do-plot-cv.R") source("cmf-do-plot-cv.R")
+bash: syntax error near unexpected token `('
+]0;~/Baskin_Project/cmfeugene-shklyars-macbook-pro:cmf eugeneshklyar$ R
+
+R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[?1034h> source("~/Baskin_Project/cmf/cmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[1Pcmf-do-plot-cv.R")[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1Pcmf-do-plot-cv.R")[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1Pcmf-do-plot-cv.R")[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1Pcmf-do-plot-cv.R")[C[C[C[C[C[C[C[C[C[C[C[C[C[1Pcmf-do-plot-cv.R")[C[C[C[C[C[C[C[C[C[C[C[C[1Pcmf-do-plot-cv.R")[C[C[C[C[C[C[C[C[C[C[C[1Pcmf-do-plot-cv.R")[C[C[C[C[C[C[C[C[C[C
+[1mError in readChar(con, 5L, useBytes = TRUE) : cannot open the connection
+[0m[1mIn addition: [0m[1mWarning message:
+[0m[1mIn readChar(con, 5L, useBytes = TRUE) :[0m[1m
+ [0m[1m cannot open compressed file 'ligands-model.RData', probable reason 'No such file or directory'
+pwd
+/Users/eugeneshklyar/Baskin_Project/cmf
+]0;~/Baskin_Project/cmfeugene-shklyars-macbook-pro:cmf eugeneshklyar$ 
