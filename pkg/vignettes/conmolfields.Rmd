@@ -8,7 +8,9 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(conmolfields)
+#conmolfields::opts_chunk$set(eval = FALSE)
 ```
 
 ## 1. Inrtoduction
@@ -1039,6 +1041,5 @@ Default values of the following parameters can be changed in it:
 - alpha – the value of the attenuation parameter $\alpha$f (default: 1.0);
 - rlevel – isosurface level (for both the fields of regression coefficients and molecular fields), (default: 0.5);
 - alpha_g – non-transperancy level for surfaces (default: 0.5.
-
 
 
