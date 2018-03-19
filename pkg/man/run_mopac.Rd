@@ -14,7 +14,7 @@ run_mopac(fname)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{fname}{}
+  \item{fname}{ }
   }
 \details{
 %%  ~~ If necessary, more details than the description above ~~

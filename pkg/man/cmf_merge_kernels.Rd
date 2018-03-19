@@ -16,8 +16,8 @@ cmf_merge_kernels(kernels_train_fname_list, kernels_train_merged_fname)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{kernels_train_fname_list}{}
-  \item{kernels_train_merged_fname}{}
+  \item{kernels_train_fname_list}{ }
+  \item{kernels_train_merged_fname}{ }
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -45,15 +45,19 @@ cmf_merge_kernels(kernels_train_fname_list, kernels_train_merged_fname)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
 ## The function is currently defined as
-cmf_merge_kernels <- function(kernels_train_fname_list, kernels_train_merged_fname)
-{}
+\dontrun{
+function(kernels_train_fname_list, kernels_train_merged_fname)
+{
+  kernels_merged <- list()
+  for (kernels_fname in kernels_train_fname_list) {
+    load(kernels_fname)
+    field_names <- names(kernels)
+    for (el in field_names) kernels_merged[[el]] <- kernels[[el]]
+  }
+  kernels <- kernels_merged
+  save(kernels, file=kernels_train_merged_fname)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+}
+}

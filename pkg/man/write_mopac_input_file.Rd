@@ -14,8 +14,8 @@ write_mopac_input_file(mol, fname)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{mol}{}
-  \item{fname}{}
+  \item{mol}{ }
+  \item{fname}{ }
   }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -48,9 +48,20 @@ write_mopac_input_file(mol, fname)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-write_mopac_input_file <- function(mol, fname) 
-{
+# Writes MOPAC inpout file with Cartesian coordinates
+write_mopac_input_file <- function(mol, fname) {
+  charge <- get_mol_charge(mol)
+  natoms <- length(mol$atoms)
+  of <- file(fname, "w")
+  cat(sprintf("AUX LARGE CHARGE=\%g GEO_REF=\"SELF\" SUPER\n", charge), file=of)
+  cat("\n", file=of)
+  cat("\n", file=of)
+  for (iatom in 1:natoms) {
+    atom <- mol$atoms[[iatom]]
+    cat(sprintf("\%-2s\%9.5f 1\%9.5f 1\%9.5f 1\n", atom$el, atom$x, atom$y, atom$z), file=of)
   }
+  close(of)
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

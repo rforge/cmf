@@ -12,12 +12,12 @@ read rectangular matrix
 read rectangular matrix
 }
 \usage{
-function(nrows, ncols)
+read_matrix(nrows, ncols)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{nrows}{}
-  \item{ncols}{}
+  \item{nrows}{ }
+  \item{ncols}{ }
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -50,10 +50,20 @@ function(nrows, ncols)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-read_matrix <- function(nrows, ncols) 
-{
+# read rectangular matrix
+  read_matrix <- function(nrows, ncols) {
+    count <- nrows * ncols
+	matr <- matrix(nrow=nrows, ncol=ncols)
+	values <- read_reals(count)
+	ival <- 0
+	for (i in 1:nrows)
+	  for (j in 1:ncols) {
+	    ival <- ival + 1
+		matr[i,j] <- values[ival]
+	  }
+	matr
   }
-}
+  }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")

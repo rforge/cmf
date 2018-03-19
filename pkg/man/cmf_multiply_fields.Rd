@@ -11,7 +11,6 @@ Get product of two fields
 }
 \usage{
 cmf_multiply_fields(grid1, grid2)
-Get product of two fields
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

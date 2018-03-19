@@ -12,13 +12,11 @@ Computes MOPAC kernel matrices for the training set and saves it to file
 Computes MOPAC kernel matrices for the training set and saves it to file
 }
 \usage{
-cmf_comp_mopac_kernels_train
-(
+cmf_comp_mopac_kernels_train(
   train_fname = "ligands-train.mol2",                              # Training set file name
   mopac_res_fname = "ligands-mopac-res-train.RData",               # File with MOPAC results
   mopac_kernels_train_fname = "ligands-mopac-kernels-train.RData", # Computed MOPAC kernels file name
-  print_comp_kernels = TRUE,                                       # Verbose computation of kernels
-  
+  print_comp_kernels = TRUE                                        # Verbose computation of kernels
 )
 
 }

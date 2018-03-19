@@ -11,7 +11,7 @@ Indicator kernel matrix predictor
 Indicator kernel matrix predictor
 }
 \usage{
-cmf_indicator_kernel_matrix_pred((mdb1, mdb2, alpha, syb_type, verbose=1) 
+cmf_indicator_kernel_matrix_pred(mdb1, mdb2, alpha, syb_type, verbose=1) 
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

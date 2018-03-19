@@ -10,14 +10,14 @@ calc_fukui
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 calc_fukui
 }
-\usage{
-calc_fukui(mol, mopac_aux)
-}
+%\usage{
+%calc_fukui(mol, mopac_aux)
+%}
 %- maybe also 'usage' for other objects documented here.
-\arguments{
-  \item{mol}{}
-  \item{mopac_aux}{}
-}
+%\arguments{
+%  \item{mol}{}
+%  \item{mopac_aux}{}
+%}
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
@@ -43,16 +43,16 @@ calc_fukui(mol, mopac_aux)
 \seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+%\examples{
+%##---- Should be DIRECTLY executable !! ----
+%##-- ==>  Define data, use random,
+%##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-calc_fukui <- function(mol, mopac_aux)
-{
-  }
-}
+%## The function is currently defined as
+%function(mol, mopac_aux)
+%{
+%  }
+%}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")

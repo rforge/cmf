@@ -1,6 +1,21 @@
 {
     "debugBreakpointsState" : {
         "breakpoints" : [
+            {
+                "editor_line_number" : 12,
+                "editor_state" : 1,
+                "function_name" : "toplevel",
+                "function_steps" : "",
+                "id" : 25,
+                "is_package_breakpoint" : false,
+                "is_pending_debug_completion" : false,
+                "line_number" : 12,
+                "needs_updated_steps" : false,
+                "package_name" : "",
+                "path" : "~/test/cmf/pkg/R/cmf-merge-kernels.R",
+                "state" : 1,
+                "type" : 1
+            }
         ]
     }
 }

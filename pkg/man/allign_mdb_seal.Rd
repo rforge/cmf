@@ -11,9 +11,9 @@ align_mdb_seal(mdb, mol_t, verbose=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{mdb}{}
-  \item{mol_t}{}
-  \item{verbose}{TRUE}
+  \item{mdb}{ }
+  \item{mol_t}{ }
+  \item{verbose}{ }
 
 }
 \details{
@@ -46,10 +46,20 @@ align_mdb_seal(mdb, mol_t, verbose=TRUE)
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (x) 
-{
+# The function is currently defined as
+ function(mdb, mol_t, verbose=TRUE) {
+  ncomp <- length(mdb)
+  mdb_a <- list()
+  for (imol in 1:ncomp) {
+    mol_m <- mdb[[imol]]
+	cat(sprintf("imol=\%d", imol))
+	res <- superpose_mol_seal(mol_m, mol_t, verbose=FALSE)
+	cat(sprintf(" af=\%g\n", res$af))
+	mdb_a[[imol]] <- res$mol
   }
+  mdb_a
+}
+  
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

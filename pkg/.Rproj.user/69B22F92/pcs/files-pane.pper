@@ -1,9 +1,13 @@
 {
-    "path" : "~/test/cmf/pkg/data",
+    "path" : "~/test/cmf/pkg/R",
     "sortOrder" : [
         {
             "ascending" : true,
             "columnIndex" : 2
+        },
+        {
+            "ascending" : false,
+            "columnIndex" : 4
         }
     ]
 }

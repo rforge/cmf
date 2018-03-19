@@ -2,16 +2,16 @@
 \name{calc_mol2mol_transvec}
 \alias{calc_mol2mol_transvec}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{calc_mol2mol_transvec} 
-\description{calc_mol2mol_transvec} 
+\title{calc mol2mol transvec} 
+\description{calc mol2mol transvec} 
 \usage{
 calc_mol2mol_transvec(mol_m, mol_r)
 }
 %- maybe also 'usage' for other objects documented here.
-\arguments{
-  \item{mol_m}{}
-  \item{mol_r}{}
-}
+%\arguments{
+%  \item{mol_m}{}
+%  \item{mol_r}{}
+%}
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }

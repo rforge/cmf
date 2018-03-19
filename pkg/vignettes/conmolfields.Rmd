@@ -1,16 +1,18 @@
 ---
 title: "CMF – R Package Implementing the Continuous Molecular Fields Approach"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 vignette: >
-  %\VignetteIndexEntry{CMF – R Package Implementing the Continuous Molecular Fields Approach} 
-  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteIndexEntry{CMF – R Package Implementing the Continuous Molecular Fields Approach}
+  %\VignetteEngine{knitr::rmarkdown}  
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
 library(knitr)
 library(conmolfields)
-#conmolfields::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(eval = FALSE)
 ```
 
 ## 1. Inrtoduction
@@ -47,7 +49,7 @@ If the first approach is chosen, it is first necessary to obtain the template su
 - atom_list – the list of serial numbers of atoms used for extracting the template substructure;
 - template_fname – file name for the template substructure.
 
-The template substructure can further be used for performing molecular alignment. This can be carried out using the following script:
+The template substructure can further be used for performing molecular alignment. This can be carried out using the following script **cmf-do-make-template**:
 
 ```
 # File name of molecular databased to be aligned
@@ -99,7 +101,7 @@ The first step in building 3D-QSAR models using the CMF approach is to compute k
 
 
 All kernels are computed for the following fixed set of attenuation parameter: 0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0.
-To carry out this kernel computation procedure, one can run the computational R script:
+To carry out this kernel computation procedure, one can run the computational R script **cmf-do-comp-kernels-train**:
 
 ```
 # Training set file name
@@ -988,6 +990,7 @@ this script:
 Molecular fields without fields of regression coefficients can be visualized using the below computational R script:
 
 ```
+
 # View overlapping fields of regression coefficients and molecular fields
 
 # Molecular database file name

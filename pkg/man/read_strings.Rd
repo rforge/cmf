@@ -14,7 +14,7 @@ read_strings(count)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{count}{}
+  \item{count}{ }
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -47,8 +47,22 @@ read_strings(count)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-read_strings <- function(count)
-{}
+ # read ncount string tokens
+  read_strings <- function(count) {
+	res <- character(count)
+    icount <- 0
+	while (icount < count) {
+	  next_line()
+	  tokens <- strsplit(aline, " +", perl=TRUE)[[1]]
+	  ntokens <- length(tokens)
+	  for (itoken in 2:ntokens) {
+	    token <- tokens[itoken]
+		res[icount+itoken-1] <- token
+	  }
+	  icount <- icount + ntokens - 1
+	}
+	res
+  }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

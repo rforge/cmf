@@ -1,15 +1,15 @@
 % File cmf-seal.R
-\name{apply_par_list <- function(xyz_m, par_list)}
-\alias{apply_par_list <- function(xyz_m, par_list)}
+\name{apply_par_list}
+\alias{apply_par_list}
 
-\title{apply_par_list <- function(xyz_m, par_list)}
-\description{apply_par_list <- function(xyz_m, par_list)}
+\title{apply_par_list}
+\description{apply_par_list}
 \usage{
-apply_par_list <- function(xyz_m, par_list)(xyz_m, par_list)
+apply_par_list(xyz_m, par_list)
 }
 \arguments{
-  \item{xyz_m}{}
-  \item{xyz_m}{par_list}
+  \item{xyz_m}{ }
+  \item{par_list}{ }
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -42,8 +42,18 @@ apply_par_list <- function(xyz_m, par_list)(xyz_m, par_list)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (x) 
-{
+apply_par_list <- function(xyz_m, par_list) {
+    q1 <- par_list[1]
+    q2 <- par_list[2]
+    q3 <- par_list[3]
+    q4 <- par_list[4]
+    t1 <- par_list[5]
+    t2 <- par_list[6]
+    t3 <- par_list[7]
+    R <- q2r(q1, q2, q3, q4)
+    Tr <- c(t1, t2, t3)
+    xyz_a <- R %*% xyz_m + T
+	xyz_a
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

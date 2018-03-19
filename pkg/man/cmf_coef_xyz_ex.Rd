@@ -11,7 +11,7 @@ Computes coefficient  at point (x,y,z)
 Computes coefficient  at point (x,y,z)
 }
 \usage{
-cmf_coef_xyz_ex(x)cmf_co(mdb, a, alpha, x, y, z, field, field_family="PHCH") 
+cmf_coef_xyz_ex(mdb, a, alpha, x, y, z, field, field_family="PHCH") 
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

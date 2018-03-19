@@ -9,8 +9,7 @@ View molecule, co-field and field
 View molecule, co-field and field
 }
 \usage{
-cmf_view_mol_field_cofield
-(
+cmf_view_mol_field_cofield(
   mdb_fname, 
   imol,                                  
   ft,

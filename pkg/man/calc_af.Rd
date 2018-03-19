@@ -5,13 +5,13 @@
 \title{calc_af}
 \description{calc_af}
 \usage{
-calc_af(xyz1, xyz2, wij, alpha=0.29))
+calc_af(xyz1, xyz2, wij, alpha=0.29)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{xyz1}{}
-\item{xyz2}{}
-\item{wij}{}
+  \item{xyz1}{ }
+\item{xyz2}{ }
+\item{wij}{ }
 \item{alpha}{0.29}
 }
 \details{
@@ -45,9 +45,21 @@ calc_af(xyz1, xyz2, wij, alpha=0.29))
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (x) 
-{
+calc_af <- function(xyz1, xyz2, wij, alpha=0.29) {
+  size1 <- dim(xyz1)[2]
+  size2 <- dim(xyz2)[2]
+  af <- 0
+  for (i in 1:size1) {
+    for (j in 1:size2) {
+	  rij2 <- 0
+	  for (k in 1:3) {
+	    rij2 <- rij2 + (xyz1[k,i]-xyz2[k,j])^2
+	  }
+	  af <- af - wij[i,j] * exp(-alpha * rij2)
+	}
   }
+  af
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

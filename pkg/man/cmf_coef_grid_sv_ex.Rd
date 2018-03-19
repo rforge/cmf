@@ -11,7 +11,7 @@ Computes coefficients for grid using support vectors
 Computes coefficients for grid using support vectors
 }
 \usage{
-cmf_coef_grid_sv_ex <- function(mdb, a, ai, alpha, grid, field, field_family="PHCH")
+cmf_coef_grid_sv_ex(mdb, a, ai, alpha, grid, field, field_family="PHCH")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -33,9 +33,7 @@ cmf_coef_grid_sv_ex <- function(mdb, a, ai, alpha, grid, field, field_family="PH
  \item{field}{
 %%     ~~Describe \code{x} here~~
 }
- \item{field_family}{
-%%     ~~Describe \code{x} here~~
-}
+ \item{field_family}{"PHCH"}
  
 }
 \details{

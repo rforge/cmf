@@ -11,8 +11,7 @@ Making predictions with analysus of ampacts of each atom
 Making predictions with analysus of ampacts of each atom
 }
 \usage{
-cmf_pred_anal_atoms(x)cmf_pred_anal_atoms <- function
-(
+cmf_pred_anal_atoms(
   train_fname = "ligands-train.mol2",  # Training set file name
   pred_fname = "ligands-pred.mol2",    # Prediction set file name
   imol = 1,                            # Molecule from file pred_fname to be analyzed

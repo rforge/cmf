@@ -11,7 +11,7 @@ Scatter plot
 Scatter plot
 }
 \usage{
-cinf_plotxy <- function(x, y, xlab="Predicted", ylab="Experimental", margin=0.5, ...)
+cinf_plotxy(x, y, xlab="Predicted", ylab="Experimental", margin=0.5, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

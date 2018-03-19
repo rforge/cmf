@@ -11,7 +11,7 @@ Computation of the kernel that compares fields of two atoms
 Computation of the kernel that compares fields of two atoms
 }
 \usage{
-cmf_aa_kernel(ft, atom1, atom2, alpha))
+cmf_aa_kernel(ft, atom1, atom2, alpha)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

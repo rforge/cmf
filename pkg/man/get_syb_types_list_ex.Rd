@@ -1,3 +1,4 @@
+% File cmf-triposff.R
 \name{get_syb_types_list_ex}
 \alias{get_syb_types_list_ex}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -12,7 +13,7 @@ get_syb_types_list_ex(mdb, min_occ=min_occ, good_list=good_list, bad_list=bad_li
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{mdb}{}
+  \item{mdb}{ }
    \item{min_occ}{0}
    \item{good_list}{NULL}
    \item{bad_list}{NULL}
@@ -46,8 +47,6 @@ get_syb_types_list_ex(mdb, min_occ=min_occ, good_list=good_list, bad_list=bad_li
 # Remove if(FALSE) block while testing, please notice file "ligands-train.mol2"
 #should exist
 
-if(FALSE)
-{
 # Training set file name
 train_fname <- "data/ligands-train.mol2"
 
@@ -71,7 +70,7 @@ get_syb_types_list_ex <- function(mdb, min_occ=0, good_list=NULL, bad_list=NULL)
   syb_types <- get_syb_types_list(mdb)
   
 }
-}
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

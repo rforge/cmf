@@ -69,7 +69,7 @@ function (grid, part = 0.01, alpha = 1, color_p = PT.Color[["O"]],
     color_n = PT.Color[["N"]], ...) 
 {
     npoints <- grid$ngridx * grid$ngridy * grid$ngridz
-    values <- rep(0, npoints)
+    %values <- rep(0, npoints)
     ivalue <- 1
     for (igridx in 1:grid$ngridx) {
         for (igridy in 1:grid$ngridy) {

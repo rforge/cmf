@@ -12,16 +12,18 @@ cmf_calc_mdb_mopac
 cmf_calc_mdb_mopac
 }
 \usage{
-cmf_calc_mdb_mopac
-(
+cmf_calc_mdb_mopac(
   mdb_fname = "ligands-train.mol2",
-  mopac_res_fname = "ligands-mopac-res-train.RData",
+  mopac_res_fname = "ligands-mopac-res-train.RData",...
 )
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{mdb_fname }{"ligands-train.mol2"}
   \item{mopac_res_fname}{"ligands-mopac-res-train.RData"}
+  \item{\dots}{
+%%     ~~Describe \code{x} here~~
+}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
