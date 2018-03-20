@@ -133,8 +133,8 @@
 
 <span class='co'>## The function is currently defined as</span>
 <span class='no'>fr</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>par_list</span>) {
-        <span class='no'>xyz_a</span> <span class='kw'>&lt;-</span> <span class='fu'>apply_par_list</span>(<span class='no'>xyz_m</span>, <span class='no'>par_list</span>)
-    <span class='no'>af</span> <span class='kw'>&lt;-</span> <span class='fu'>calc_af</span>(<span class='no'>xyz_a</span>, <span class='no'>xyz_t</span>, <span class='no'>wij</span>)
+        <span class='no'>xyz_a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='apply_par_list.html'>apply_par_list</a></span>(<span class='no'>xyz_m</span>, <span class='no'>par_list</span>)
+    <span class='no'>af</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='calc_af.html'>calc_af</a></span>(<span class='no'>xyz_a</span>, <span class='no'>xyz_t</span>, <span class='no'>wij</span>)
     <span class='kw'>if</span> (<span class='no'>verbose</span>) <span class='fu'>cat</span>(<span class='fu'>sprintf</span>(<span class='st'>"af=%g q1=%g q2=%g q3=%g q4=%g t1=%g t2=%g t3=%g\n"</span>,
       <span class='no'>af</span>, <span class='no'>par_list</span>[<span class='fl'>1</span>], <span class='no'>par_list</span>[<span class='fl'>2</span>], <span class='no'>par_list</span>[<span class='fl'>3</span>], <span class='no'>par_list</span>[<span class='fl'>4</span>], <span class='no'>par_list</span>[<span class='fl'>5</span>], <span class='no'>par_list</span>[<span class='fl'>6</span>],
           <span class='no'>par_list</span>[<span class='fl'>7</span>])); <span class='fu'>flush.console</span>()

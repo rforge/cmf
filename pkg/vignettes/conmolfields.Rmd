@@ -1,12 +1,10 @@
 ---
 title: "CMF – R Package Implementing the Continuous Molecular Fields Approach"
 output:
-  html_document:
+  pdf_document:
     df_print: paged
-vignette: >
-  %\VignetteIndexEntry{CMF – R Package Implementing the Continuous Molecular Fields Approach}
-  %\VignetteEngine{knitr::rmarkdown}  
-  %\VignetteEncoding{UTF-8}
+vignette: |
+  \VignetteIndexEntry{CMF – R Package Implementing the Continuous Molecular Fields Approach} \VignetteEngine{knitr::rmarkdown}   \VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
