@@ -181,7 +181,7 @@ comp_kernels_train(
 <div id="building-3d-qsar-regression-model-using-the-training-set" class="section level2">
 <h2 class="hasAnchor">
 <a href="#building-3d-qsar-regression-model-using-the-training-set" class="anchor"></a>4.3. Building 3D-QSAR regression model using the training set</h2>
-<p>The second step is to build a 3D-QSAR model and write it to a file. This is performed by running the script</p>
+<p>The second step is to build a 3D-QSAR model and write it to a file. This is performed by running the script <strong>cmf-do-krr-train</strong>:</p>
 <pre><code># Activity file name
 act_train_fname &lt;- "activity-train.txt"
 
@@ -267,7 +267,7 @@ cmf_krr_train(
 <div id="the-use-of-3d-qsar-model-for-predicting-activities-of-test-set-compounds" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-use-of-3d-qsar-model-for-predicting-activities-of-test-set-compounds" class="anchor"></a>4.4. The Use of 3D-QSAR Model for Predicting Activities of Test Set Compounds</h2>
-<p>Predicting activities of compounds belonging to the external test set is carried out in two steps. In the first step, one should compute kernels comparing molecular fields of all compounds belonging to the test set with molecular fields of all compounds belonging to the training set. To do that, it is necessary to run script</p>
+<p>Predicting activities of compounds belonging to the external test set is carried out in two steps. In the first step, one should compute kernels comparing molecular fields of all compounds belonging to the test set with molecular fields of all compounds belonging to the training set. To do that, it is necessary to run script <strong>cmf-do-comp-kernels-pred</strong> :</p>
 <pre><code># Training set file name
 train_fname &lt;- "ligands-train.mol2"
 
@@ -291,22 +291,68 @@ comp_kernels_pred(
   print_comp_kernels = print_comp_kernels
 )
 </code></pre>
-<p>The values of the following parameters may be modified in the script: train_fname - the name of the mol2 file containing the structures from the training set (default: “ligands-train.mol2”); pred_fname - the name of the mol2 file containing the structures from the test set (default: “ligands-pred.mol2”); kernels_pred_fname - file name for storing computed kernels (default: “ligands-kernels-pred.mol2”); mfields – the list of molecular fields for which kernels should be computed (default: c(“q”,“vdw”,“logp”,“abra”,“abrb”));</p>
+<p>The values of the following parameters may be modified in the script: - train_fname - the name of the mol2 file containing the structures from the training set (default: “ligands-train.mol2”); - pred_fname - the name of the mol2 file containing the structures from the test set (default: “ligands-pred.mol2”); - kernels_pred_fname - file name for storing computed kernels (default: “ligands-kernels-pred.mol2”); - mfields – the list of molecular fields for which kernels should be computed (default: c(“q”,“vdw”,“logp”,“abra”,“abrb”));</p>
 <ul>
-<li><p>print_comp_kernels – whether to verbose computation of kernels (TRUE/FALSE or 1/0), (default: TRUE). The second step is to make predictions by running the script cmf-do-krr-pred.R. The results of prediction is written to the file referenced by the variable pred_fname. The values of the following parameters may be modified in the script:</p></li>
+<li>print_comp_kernels – whether to verbose computation of kernels (TRUE/FALSE or 1/0), (default: TRUE).</li>
+</ul>
+<p>The second step is to make predictions by running the script <strong>cmf-do-krr-pred</strong> :</p>
+<pre><code># Prediction for KRR models with continuous molecular fields
+
+
+# Model file name
+model_fname &lt;- "ligands-model.RData"
+
+# Kernels for training file name
+kernels_train_fname &lt;- "ligands-kernels-train.RData"
+
+# Kernels for prediction file name
+kernels_pred_fname &lt;- "ligands-kernels-pred.RData"
+
+# Column name or activity (if specified)
+act_colnum &lt;- 1
+
+# Separator
+sep &lt;- ","
+
+# Activity for prediction set (if specified)
+act_pred_fname &lt;- "activity-pred.txt"
+
+# File with predictions
+pred_fname &lt;- "ligands-pred.RData"
+
+# Print statistical parameters for prediction (TRUE/FALSE, 1/0)
+print_pred &lt;- TRUE
+
+# Produce scatter plot prediction on external database (TRUE/FALSE, 1/0)
+plot_pred &lt;- TRUE    
+
+res &lt;- cmf_krr_pred(
+  model_fname = model_fname, 
+  kernels_train_fname = kernels_train_fname,
+  kernels_pred_fname = kernels_pred_fname, 
+  act_colnum = act_colnum, 
+  sep = sep, 
+  act_pred_fname = act_pred_fname,
+  pred_fname = pred_fname,
+  print_pred = print_pred,
+  plot_pred = plot_pred
+)
+</code></pre>
+<p>The results of prediction is written to the file referenced by the variable pred_fname. The values of the following parameters may be modified in the script:</p>
+<ul>
 <li>model_fname - the name of the file containing 3D-QSAR model (default: “ligands-model.RData”);</li>
 <li>kernels_pred_fname - file name of the file containing kernels that compare molecular fields of molecules belonging to the training and the test sets (computed at the first step) (default: “ligands-kernels-pred.RData”);</li>
 <li>act_colnum - the number of the column with activity values in the file act_pred_fname (If act_colnum=0 then it is assumed that the experimental values of activities are unknown) (default: 2);</li>
 <li>sep - separator of text fields in the file act_pred_fname containing activity values (if act_colnum &gt; 0) (default “,”);</li>
 <li>act_pred_fname - the name of the text file containing the values of activity for all compounds from the test set (if act_colnum &gt; 0) (default: “activity-pred.txt”);</li>
 <li>pred_fname - file with predictions (default: “ligands-pred.RData”); print_pred – whether to print statistical parameters for prediction (TRUE/FALSE, 1/0), (default: FALSE);</li>
-<li><p>plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE).</p></li>
+<li>plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE).</li>
 </ul>
 </div>
 <div id="building-3d-qsar-models-using-external-n-fold-cross-validation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#building-3d-qsar-models-using-external-n-fold-cross-validation" class="anchor"></a>4.5. Building 3D-QSAR models using external n-fold cross-validation</h2>
-<p>Before building 3D-QSAR models using external n-fold cross-validation, it is necessary to compute kernels for the whole dataset. This can be done using the script</p>
+<p>Before building 3D-QSAR models using external n-fold cross-validation, it is necessary to compute kernels for the whole dataset. This can be done using the script <strong>cmf-do-comp-kernels-all</strong>:</p>
 <pre><code># The whole set file name
 all_fname &lt;- "ligands-all.mol2"
 
@@ -331,7 +377,7 @@ comp_kernels_all(
 <li>all_fname - the name of the mol2 file containing the whole set of compounds (default: “ligands-all.mol2”);</li>
 <li>kernels_all_fname - the name of file with computed kernels (default: “ligands-kernels-all.RData”);</li>
 <li>mfields – the list of molecular fields for which kernels should be computed (default: c(“q”,“vdw”,“logp”,“abra”,“abrb”));</li>
-<li>print_comp_kernels – whether to verbose computation of kernels (TRUE/FALSE or 1/0), (default: TRUE) After that, in order to perform external n-fold cross-validation, one can launch the script</li>
+<li>print_comp_kernels – whether to verbose computation of kernels (TRUE/FALSE or 1/0), (default: TRUE) After that, in order to perform external n-fold cross-validation, one can launch the script <strong>cmf-do-krr-ecv</strong>:</li>
 </ul>
 <pre><code># The number of folds in n-folds cross-validation
 nfolds &lt;- 5
@@ -439,7 +485,7 @@ ecv &lt;- cmf_krr_ecv(
 <li>print_final_icv – whether to print final results on internal cross-validation (TRUE/FALSE, 1/0), (default: TRUE);</li>
 <li>plot_final_icv – whether to produce final scatter plot for internal cross-validation (TRUE/FALSE, 1/0), (default: TRUE);</li>
 <li>print_pred – whether to print statistical parameters for prediction (TRUE/FALSE, 1/0), (default: FALSE);</li>
-<li><p>plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE). In order to perform external n-fold cross-validation with reshuffles (random renumbering of molecules), one can launch the script</p></li>
+<li><p>plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE). In order to perform external n-fold cross-validation with reshuffles (random renumbering of molecules), one can launch the script <strong>cmf-do-krr-ecvr</strong></p></li>
 </ul>
 <pre><code># The number of folds for n-folds cross-validation
 nfolds &lt;- 5
@@ -565,7 +611,7 @@ ecvr &lt;- cmf_krr_ecvr(
 <li>print_final_icv – whether to print final results on internal cross-validation (TRUE/FALSE, 1/0), (default: TRUE);</li>
 <li>plot_final_icv – whether to produce final scatter plot for internal cross-validation (TRUE/FALSE, 1/0), (default: TRUE);</li>
 <li>print_pred – whether to print statistical parameters for prediction (TRUE/FALSE, 1/0), (default: FALSE);</li>
-<li>plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE). Models built for each fold of the external cross-validation with reshuffles procedure and stored in the file with its results can be used for making multiple predictions for an external test set. This can be carried out using the script</li>
+<li>plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE). Models built for each fold of the external cross-validation with reshuffles procedure and stored in the file with its results can be used for making multiple predictions for an external test set. This can be carried out using the script <strong>cmf-do-krr-ecvr-pred</strong>:</li>
 </ul>
 <pre><code># File name for reshuffled external cross-validation
 ecvr_fname &lt;- "ligands-ecvr.RData"
@@ -616,7 +662,7 @@ ecvr_pred &lt;- cmf_krr_ecvr_pred(
 <li>act_pred_fname – file with activity values for the test set (if specified), (default: “activity-pred.txt”).</li>
 <li>pred_fname - the name of the file containing the results of predictions (default: “ligands-ecvr-pred.mol2”);</li>
 <li>print_pred – whether to print statistical parameters for prediction (TRUE/FALSE, 1/0), (default: FALSE);</li>
-<li>plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE). Histogram of predicted values for each individual compounds can be visualized using the script</li>
+<li>plot_pred – whether to produce scatter plot prediction on external database (TRUE/FALSE, 1/0), (default: FALSE). Histogram of predicted values for each individual compounds can be visualized using the script <strong>cmf-do-ecvr-view-pred</strong>:</li>
 </ul>
 <pre><code># Visualisation of prediction histogram from multiple predictions m
 # made by external cross-validation with reshuffling (ecvr)
@@ -638,7 +684,7 @@ hist(ecvr_pred$YPred[imol,], main="Prediction Histogram", xlab="Predicted Value"
 <div id="producing-scatter-plots" class="section level2">
 <h2 class="hasAnchor">
 <a href="#producing-scatter-plots" class="anchor"></a>4.6. Producing Scatter Plots</h2>
-<p>The scripts</p>
+<p>The script <strong>cmf-do-krr-train</strong>:</p>
 <pre><code># KRR with continuous molecular fields and optimization of  gamma and h.
 # alpha is optimized by grid search
 # Any combination of molecular fields is supported
@@ -706,7 +752,7 @@ cmf_krr_train(
   plot_final_icv = plot_final_icv
 )
 </code></pre>
-<p>and</p>
+<p>and <strong>cmf-do-krr-pred</strong>:</p>
 <pre><code>
 # Model file name
 model_fname &lt;- "ligands-model.RData"
@@ -747,25 +793,10 @@ res &lt;- cmf_krr_pred(
   plot_pred = plot_pred
 )
 </code></pre>
-<p>not only build 3D-QSAR models and use them to make predictions, but also produce the corresponding scatter plots. Meanwhile, if it is necessary to reproduce these scatter plots, two computational R scripts can be used for this purpose:</p>
-<p>The below script produces the scatter plot Predicted/Expetimental for the results of internal cross-validation. The values of the following parameters may be modified in the script:</p>
-<ul>
-<li>fmodel - the name of the file containing model (default: “ligands-model.RData”);</li>
-<li>main – the main title (default: “Scatter Plot for Cross-Validation (Internal)”);</li>
-<li>xlab - text label for axis X (default: “Predicted”);</li>
-<li>ylab - text label for axis Y (default: “Experimental”);</li>
-<li>margin - margin for points in all directions (default: 0.5).</li>
-</ul>
-<pre><code># Script for drawing scatter plot for cross-validation results
-
-
-# File with model
-fmodel &lt;- "ligands-model.RData"
-
-# Main title
-main &lt;- "Scatter Plot for Cross-Validation (Internal)"
-
-# Label for axis X
+<p>not only build 3D-QSAR models and use them to make predictions, but also produce the corresponding scatter plots.</p>
+<p>Meanwhile, if it is necessary to reproduce these scatter plots, two computational R scripts can be used for this purpose:</p>
+<p>The script <strong>cmf-do-plot-cv</strong>:</p>
+<pre><code># Label for axis X
 xlab &lt;- "Predicted"
 
 # Label for axis Y
@@ -785,8 +816,16 @@ cinf_plotxy(
   main = main
 )
 </code></pre>
+<p>produces the scatter plot Predicted/Expetimental for the results of internal cross-validation. The values of the following parameters may be modified in the script:</p>
+<ul>
+<li>fmodel - the name of the file containing model (default: “ligands-model.RData”);</li>
+<li>main – the main title (default: “Scatter Plot for Cross-Validation (Internal)”);</li>
+<li>xlab - text label for axis X (default: “Predicted”);</li>
+<li>ylab - text label for axis Y (default: “Experimental”);</li>
+<li>margin - margin for points in all directions (default: 0.5).</li>
+</ul>
 <p>and</p>
-<p>The below script produces scatter plot Predicted/Experimental for the results of predictions performed on external test set. The values of the following parameters may be modified in the script:</p>
+<p>The script <strong>cmf-do-plot-pred</strong> produces scatter plot Predicted/Experimental for the results of predictions performed on external test set. The values of the following parameters may be modified in the script:</p>
 <ul>
 <li>fpred - the name of the file with predictions (default: “ligands-pred.RData”);</li>
 <li>main – the main title (default: “Scatter Plot for Prediction”);</li>
@@ -826,7 +865,7 @@ cinf_plotxy(
 <div id="drawing-iso-surfaces-for-the-fields-of-regression-coefficients-and-their-overlap-with-molecular-fields" class="section level2">
 <h2 class="hasAnchor">
 <a href="#drawing-iso-surfaces-for-the-fields-of-regression-coefficients-and-their-overlap-with-molecular-fields" class="anchor"></a>4.7. Drawing Iso-surfaces for the Fields of Regression Coefficients and their Overlap with Molecular Fields</h2>
-<p>The fields of regression coefficients can be visualized with the help of iso-surfaces (colored according to the sign of coefficients and the type of molecular field). The procedure for constructing such iso-surfaces includes two stages. In the first stage the values of regression coefficients are calculated on all nodes in an imaginary grid using the R computational script:</p>
+<p>The fields of regression coefficients can be visualized with the help of iso-surfaces (colored according to the sign of coefficients and the type of molecular field). The procedure for constructing such iso-surfaces includes two stages. In the first stage the values of regression coefficients are calculated on all nodes in an imaginary grid using the R computational script <strong>cmf-do-gen-grid</strong>:</p>
 <pre><code># Generation of grid for continuous molecular co-fields
 
 # Training set file name
@@ -894,7 +933,7 @@ cmf_view_mol_field_cofield(
 <li>ft - the field type (q/vdw/logp/abra/abrb), (default: “logp”);</li>
 <li>grid_fname - the name of the file containing model (regression) coefficients computed at all grid nodes (default: “ligands-grid-krr.RData”);</li>
 <li>rlevel – isosurface level (default: 0.5);</li>
-<li>alpha - alpha (non-transperancy) level for surfaces in 3D graphics (default: 0.7). One can also visualize overlapping fields of regression coefficients (i.e. co-fields) with the corresponding molecular fields. This can be done by running script:</li>
+<li>alpha - alpha (non-transperancy) level for surfaces in 3D graphics (default: 0.7). One can also visualize overlapping fields of regression coefficients (i.e. co-fields) with the corresponding molecular fields. This can be done by running script <strong>cmf-do-view-mol-field-cofield</strong>:</li>
 </ul>
 <pre><code># View overlapping fields of regression coefficients and molecular fields
 
