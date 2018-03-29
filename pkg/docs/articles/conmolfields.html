@@ -1012,6 +1012,169 @@ cmf_view_mol_field_cofield(
 <li>alpha_g – non-transperancy level for surfaces (default: 0.5.</li>
 </ul>
 </div>
+<div id="analyzing-contributions-to-predicted-activity-values" class="section level2">
+<h2 class="hasAnchor">
+<a href="#analyzing-contributions-to-predicted-activity-values" class="anchor"></a>4.8. Analyzing Contributions to Predicted Activity Values</h2>
+<p>Contributions of different types of molecular fields and different training examples to predicted activity (property) values of compounds belonging to the test set can be calculated using the script <strong>cmd-do- anal-contrib-pred</strong>. The results of the analysis can be read from the variable a. The default values of the following parameters can be changes:</p>
+<ul>
+<li>model_fname – model file name (default: “ligands-model.RData”);</li>
+<li>kernels_pred_fname - file name of the file containing kernels that compare molecular fields of molecules belonging to the training and the test sets (default: “ligands-kernels-pred.RData”);</li>
+<li>act_colnum - activity column number in the file act_pred_fname; zero value means that the activity is not specified (default: 1);</li>
+<li>sep – separator of columns in file act_pred_fname (default: “,”);</li>
+<li>act_pred_fname – file with activity values for the test set (if specified), (default: “activity-pred.txt”). Contributions of different types of molecular fields and different training examples to predicted activity (property) values of compounds belonging to the training set can be calculated using the script <strong>cmf-do-anal-contrib-train</strong>:</li>
+</ul>
+<pre><code># Prediction with analysis for the test set
+
+# Model file name
+model_fname &lt;- "ligands-model.RData"
+
+# Kernels file name
+kernels_pred_fname &lt;- "ligands-kernels-pred.RData"
+
+# Column name or activity (if specified)
+act_colnum &lt;- 2
+
+# Separator
+sep &lt;- ","
+
+# Activity for prediction set (if specified)
+act_pred_fname &lt;- "activity-pred.txt"
+
+anal &lt;- cmf_pred_anal(
+  model_fname = model_fname, 
+  kernels_pred_fname = kernels_pred_fname, 
+  act_colnum = act_colnum, 
+  sep = sep, 
+  act_pred_fname = act_pred_fname,
+  is_train = FALSE
+)
+</code></pre>
+<p>The results of the analysis can be read from the variable anal. The default values of the following parameters can be changes:</p>
+<ul>
+<li>model_fname – model file name (default: “ligands-model.RData”);</li>
+<li>kernels_fname_train - file name of the file containing kernels for - the training set (default: “ligands-kernels-train.RData”);</li>
+<li>act_colnum - activity column number in the file act_train_fname (default: 2);</li>
+<li>sep – separator of columns in file act_train_fname (default: “,”);</li>
+<li>act_train_fname – file with activity values for the training set (default: “activity-train.txt”).</li>
+</ul>
+<p>Contributions of individual atoms to predicted activity (property) values of compounds belonging to the test set can be calculated using the script <strong>cmf-do-anal-contrib-atoms-pred</strong>:</p>
+<pre><code># Analysis of atomic contributions for the test set
+
+
+# Training set file name
+train_fname &lt;- "ligands-train.mol2"
+
+# Prediction set file name
+pred_fname &lt;- "ligands-pred.mol2"
+
+# Molecule from file pred_fname to be analyzed
+imol &lt;- 1
+
+# Model file name
+model_fname &lt;- "ligands-model.RData"
+
+cmf_pred_anal_atoms(
+  train_fname = train_fname, 
+  pred_fname = pred_fname, 
+  imol = imol, 
+  model_fname = model_fname
+)
+</code></pre>
+<p>The default values of the following parameters can be changes:</p>
+<ul>
+<li>train_fname – training set file name (default: “ligands-train.mol2”);</li>
+<li>pred_fname – test set file name (default: “ligands-pred.mol2”);</li>
+<li>imol – molecule from file pred_fname to be analyzed (default: 1);</li>
+<li>model_fname – model file name (default: “ligands-model.RData”). Contributions of individual atoms to predicted activity (property) values of compounds belonging to the training set can be calculated using the script <strong>cmf-do-anal-contrib-atoms-train</strong>:</li>
+</ul>
+<pre><code># Analysis of atomic contributions in molecules from the training set
+
+
+# Training set file name
+train_fname &lt;- "ligands-train.mol2"
+
+# Molecule from file train_fname to be analyzed
+imol &lt;- 1
+
+# Model file name
+model_fname &lt;- "ligands-model.RData"
+
+cmf_pred_anal_atoms(
+  train_fname = train_fname, 
+  pred_fname = train_fname, 
+  imol = imol, 
+  model_fname = model_fname
+)
+</code></pre>
+<p>The default values of the following parameters can be changes:</p>
+<ul>
+<li>train_fname – training set file name (default: “ligands-train.mol2”);</li>
+<li>imol – molecule from file train_fname to be analyzed (default: 1);</li>
+<li>model_fname – model file name (default: “ligands-model.RData”).</li>
+</ul>
+</div>
+<div id="exploring-applicability-domain-of-3d-qsar-models" class="section level2">
+<h2 class="hasAnchor">
+<a href="#exploring-applicability-domain-of-3d-qsar-models" class="anchor"></a>4.9. Exploring Applicability Domain of 3D-QSAR Models</h2>
+<p>The package contains several tools for exploring applicability domains of 3D-QSAR model. If the standard deviation of prediction in external cross-validation with reshuffles is chosen as a distance to model parameter and mean prediction is used for computing prediction error, one can produce “coverage – mean error” and “distance to model - error” plots. The first one can be produced by running the script <strong>cmf-do-ecvr-plot-coverage-mean-error</strong>:</p>
+<pre><code># Applicability domain from results of external cross-validation with reshuffles
+
+
+# File name for results of external cross-validation with reshuffles
+ecvr_fname &lt;- "ligands-ecvr-train.RData"
+
+# Coverage - mean error plot type ("in", "out", "diff")
+# "in" - mean error is calculated inside applicability domain
+# "out" - mean error is calculated outside applicability domain
+# "diff" - difference of mean errors outside and inside applicability domain 
+cmep_type &lt;- "in"
+
+# Whether to draw smoothing curve (TRUE/FALSE, 1/0)
+smoothing &lt;- TRUE  
+
+cmf_ecvr_plot_coverage_mean_error(
+  ecvr_fname = ecvr_fname, 
+  cmep_type = cmep_type,
+  smoothing = smoothing
+)
+
+</code></pre>
+<p>, in which the following default values of parameters can be changed:</p>
+<ul>
+<li>ecvr_fname - file name for results of external cross-validation with reshuffles (default: ligands-ecvr.RData);</li>
+<li>cmep_type – the type of the “coverage – mean error” plot (“in” - mean error is calculated inside applicability domain; “out” - mean error is calculated outside applicability domain; “diff” - difference of mean errors outside and inside applicability domain) (default: “in”);</li>
+<li>smoothing - whether to draw smoothing curve (TRUE/FALSE, 1/0) (default: TRUE). The “distance to model - error” plot can be produced by launching the script <strong>cmf-do-ecvr-plot-d2m-error</strong>:</li>
+</ul>
+<pre><code># Producing "distance to model - error" plot for applicability domain studies
+
+
+# File name for resukts of external cross-validation with reshuffles
+ecvr_fname &lt;- "ligands-ecvr.RData"
+
+# Whether to calculate mean error values for parts of the points (TRUE/FALSE, 1/0)
+mean_parts &lt;- TRUE  
+
+# The number of parts for averaging
+nparts &lt;- 3   
+
+# Color for drawing mean errors of parts
+color_parts &lt;- "red" 
+
+cmf_ecvr_plot_d2m_error(
+  ecvr_fname=ecvr_fname,
+  mean_parts=mean_parts,
+  nparts=nparts,
+  color_parts=color_parts
+)
+</code></pre>
+<p>, in which the following default values of parameters can be changed:</p>
+<ul>
+<li>ecvr_fname - file name for results of external cross-validation with reshuffles (default: ligands-ecvr.RData);</li>
+<li>mean_parts - Whether to calculate mean error values for parts of the points (TRUE/FALSE, 1/0) (default: TRUE);</li>
+<li>nparts - the number of parts for averaging (default: 3);</li>
+<li>color_parts - color for drawing mean errors of parts (default: “red”).</li>
+</ul>
+</div>
 </div>
   </div>
 
@@ -1030,6 +1193,8 @@ cmf_view_mol_field_cofield(
       <li><a href="#building-3d-qsar-models-using-external-n-fold-cross-validation">4.5. Building 3D-QSAR models using external n-fold cross-validation</a></li>
       <li><a href="#producing-scatter-plots">4.6. Producing Scatter Plots</a></li>
       <li><a href="#drawing-iso-surfaces-for-the-fields-of-regression-coefficients-and-their-overlap-with-molecular-fields">4.7. Drawing Iso-surfaces for the Fields of Regression Coefficients and their Overlap with Molecular Fields</a></li>
+      <li><a href="#analyzing-contributions-to-predicted-activity-values">4.8. Analyzing Contributions to Predicted Activity Values</a></li>
+      <li><a href="#exploring-applicability-domain-of-3d-qsar-models">4.9. Exploring Applicability Domain of 3D-QSAR Models</a></li>
       </ul>
 </div>
       </div>

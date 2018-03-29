@@ -1,10 +1,12 @@
 ---
 title: "CMF – R Package Implementing the Continuous Molecular Fields Approach"
 output:
-  pdf_document:
-    df_print: paged
-vignette: |
-  \VignetteIndexEntry{CMF – R Package Implementing the Continuous Molecular Fields Approach} \VignetteEngine{knitr::rmarkdown}   \VignetteEncoding{UTF-8}
+
+  pdf_document: 
+    keep_tex: yes
+vignette: >
+  %VignetteEncoding{UTF-8}
+  %VignetteIndexEntry{CMF – R Package Implementing the Continuous Molecular Fields Approach} %VignetteEngine{knitr::rmarkdown}   
 ---
 
 ```{r setup, include=FALSE}
@@ -1042,5 +1044,181 @@ Default values of the following parameters can be changed in it:
 - alpha – the value of the attenuation parameter $\alpha$f (default: 1.0);
 - rlevel – isosurface level (for both the fields of regression coefficients and molecular fields), (default: 0.5);
 - alpha_g – non-transperancy level for surfaces (default: 0.5.
+
+## 4.8. Analyzing Contributions to Predicted Activity Values
+
+Contributions of different types of molecular fields and different training examples to predicted activity (property) values of compounds belonging to the test set can be calculated using the script **cmd-do- anal-contrib-pred**. 
+The results of the analysis can be read from the variable a. The default values of the following parameters can be changes:
+
+- model_fname – model file name (default: “ligands-model.RData”);
+- kernels_pred_fname - file name of the file containing kernels that compare molecular fields of molecules belonging to the training and the test sets (default: “ligands-kernels-pred.RData”);
+- act_colnum - activity column number in the file act_pred_fname; zero value means that the activity is not specified (default: 1);
+- sep – separator of columns in file act_pred_fname (default: “,”);
+- act_pred_fname – file with activity values for the test set (if specified), (default: “activity-pred.txt”).
+Contributions of different types of molecular fields and different training examples to predicted activity (property) values of compounds belonging to the training set can be calculated using the script **cmf-do-anal-contrib-train**:
+
+```
+# Prediction with analysis for the test set
+
+# Model file name
+model_fname <- "ligands-model.RData"
+
+# Kernels file name
+kernels_pred_fname <- "ligands-kernels-pred.RData"
+
+# Column name or activity (if specified)
+act_colnum <- 2
+
+# Separator
+sep <- ","
+
+# Activity for prediction set (if specified)
+act_pred_fname <- "activity-pred.txt"
+
+anal <- cmf_pred_anal(
+  model_fname = model_fname, 
+  kernels_pred_fname = kernels_pred_fname, 
+  act_colnum = act_colnum, 
+  sep = sep, 
+  act_pred_fname = act_pred_fname,
+  is_train = FALSE
+)
+
+```
+The results of the analysis can be read from the variable anal. The default values of the following parameters can be changes:
+
+- model_fname – model file name (default: “ligands-model.RData”);
+- kernels_fname_train - file name of the file containing kernels for - the training set (default: “ligands-kernels-train.RData”);
+- act_colnum - activity column number in the file act_train_fname (default: 2);
+- sep – separator of columns in file act_train_fname (default: “,”);
+- act_train_fname – file with activity values for the training set (default: “activity-train.txt”).
+
+Contributions of individual atoms to predicted activity (property) values of compounds belonging to the test set can be calculated using the script **cmf-do-anal-contrib-atoms-pred**:
+
+```
+# Analysis of atomic contributions for the test set
+
+
+# Training set file name
+train_fname <- "ligands-train.mol2"
+
+# Prediction set file name
+pred_fname <- "ligands-pred.mol2"
+
+# Molecule from file pred_fname to be analyzed
+imol <- 1
+
+# Model file name
+model_fname <- "ligands-model.RData"
+
+cmf_pred_anal_atoms(
+  train_fname = train_fname, 
+  pred_fname = pred_fname, 
+  imol = imol, 
+  model_fname = model_fname
+)
+
+```
+
+The default values of the following parameters can be changes:
+
+- train_fname – training set file name (default: “ligands-train.mol2”);
+- pred_fname – test set file name (default: “ligands-pred.mol2”);
+- imol – molecule from file pred_fname to be analyzed (default: 1);
+- model_fname – model file name (default: “ligands-model.RData”).
+Contributions of individual atoms to predicted activity (property) values of compounds belonging to the training set can be calculated using the script **cmf-do-anal-contrib-atoms-train**:
+
+```
+# Analysis of atomic contributions in molecules from the training set
+
+
+# Training set file name
+train_fname <- "ligands-train.mol2"
+
+# Molecule from file train_fname to be analyzed
+imol <- 1
+
+# Model file name
+model_fname <- "ligands-model.RData"
+
+cmf_pred_anal_atoms(
+  train_fname = train_fname, 
+  pred_fname = train_fname, 
+  imol = imol, 
+  model_fname = model_fname
+)
+
+```
+The default values of the following parameters can be changes:
+
+- train_fname – training set file name (default: “ligands-train.mol2”);
+- imol – molecule from file train_fname to be analyzed (default: 1);
+- model_fname – model file name (default: “ligands-model.RData”).
+
+## 4.9. Exploring Applicability Domain of 3D-QSAR Models
+
+The package contains several tools for exploring applicability domains of 3D-QSAR model. If the standard deviation of prediction in external cross-validation with reshuffles is chosen as a distance to model parameter and mean prediction is used for computing prediction error, one can produce “coverage – mean error” and “distance to model - error” plots. The first one can be produced by running the script **cmf-do-ecvr-plot-coverage-mean-error**:
+
+```
+# Applicability domain from results of external cross-validation with reshuffles
+
+
+# File name for results of external cross-validation with reshuffles
+ecvr_fname <- "ligands-ecvr-train.RData"
+
+# Coverage - mean error plot type ("in", "out", "diff")
+# "in" - mean error is calculated inside applicability domain
+# "out" - mean error is calculated outside applicability domain
+# "diff" - difference of mean errors outside and inside applicability domain 
+cmep_type <- "in"
+
+# Whether to draw smoothing curve (TRUE/FALSE, 1/0)
+smoothing <- TRUE  
+
+cmf_ecvr_plot_coverage_mean_error(
+  ecvr_fname = ecvr_fname, 
+  cmep_type = cmep_type,
+  smoothing = smoothing
+)
+
+
+```
+, in which the following default values of parameters can be changed:
+
+- ecvr_fname - file name for results of external cross-validation with reshuffles (default: ligands-ecvr.RData);
+- cmep_type – the type of the “coverage – mean error” plot ("in" - mean error is calculated inside applicability domain; "out" - mean error is calculated outside applicability domain; "diff" - difference of mean errors outside and inside applicability domain) (default: “in”);
+- smoothing - whether to draw smoothing curve (TRUE/FALSE, 1/0) (default: TRUE).
+The “distance to model - error” plot can be produced by launching the script **cmf-do-ecvr-plot-d2m-error**:
+
+```
+# Producing "distance to model - error" plot for applicability domain studies
+
+
+# File name for resukts of external cross-validation with reshuffles
+ecvr_fname <- "ligands-ecvr.RData"
+
+# Whether to calculate mean error values for parts of the points (TRUE/FALSE, 1/0)
+mean_parts <- TRUE  
+
+# The number of parts for averaging
+nparts <- 3   
+
+# Color for drawing mean errors of parts
+color_parts <- "red" 
+
+cmf_ecvr_plot_d2m_error(
+  ecvr_fname=ecvr_fname,
+  mean_parts=mean_parts,
+  nparts=nparts,
+  color_parts=color_parts
+)
+
+```
+, in which the following default values of parameters can be changed:
+
+- ecvr_fname - file name for results of external cross-validation with reshuffles (default: ligands-ecvr.RData);
+- mean_parts - Whether to calculate mean error values for parts of the points (TRUE/FALSE, 1/0) (default: TRUE);
+- nparts - the number of parts for averaging (default: 3);
+- color_parts - color for drawing mean errors of parts (default: “red”).
 
 
