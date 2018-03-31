@@ -1028,7 +1028,7 @@ this script:
 - alpha_g – non-transperancy level for surfaces (default: 0.5);
 - draw_overlap – whether to visualize the overlap separately with additional iso-surfaces (TRUE/FALSE or 1/0) (default: FALSE).
 
-Molecular fields without fields of regression coefficients can be visualized using the below computational R script:
+Molecular fields without fields of regression coefficients can be visualized using the below computational R script **cmf-do-view-mol-field**:
 
 ```
 
