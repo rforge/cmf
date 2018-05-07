@@ -1,6 +1,4 @@
-# Rely on the 'WorldPhones' dataset in the datasets
-# package (which generally comes preloaded).
-#library(datasets)
+#
 library(shiny)
 require(conmolfields)
 
@@ -30,26 +28,7 @@ fluidPage(
      p("Click the button to update the value displayed in the main panel.")
      ),
    
-      #
-      #selectInput("activity", "Activity:",
-       #           c("activity-train.txt", "activity-train.txt", "activity-train.txt"))
-
-
-    #),
     ##
-   # sidebarPanel(
-    #  selectInput("region", "Region:",
-     #             choices=colnames(WorldPhones)),
-    #  hr(),
-    #  helpText("Data from AT&T (1961) The World's Telephones.")
-    #),
-
-    # Create a spot for the barplot
-    #mainPanel(
-    #  plotOutput("phonePlot"),
-    #  textOutput("text"),
-    #  textOutput("text1")
-    #)
    mainPanel(
      tags$style(type="text/css",
                 ".shiny-output-error { visibility: hidden; }",

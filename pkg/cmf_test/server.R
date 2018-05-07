@@ -1,5 +1,4 @@
-# Rely on the 'WorldPhones' dataset in the datasets
-# package (which generally comes preloaded).
+#
 library(shiny)
 require(conmolfields)
 
@@ -7,9 +6,7 @@ require(conmolfields)
 function(input, output) {
  
   # Fill in the spot we created for a plot
-
     ###
-
     # Activity file name
     act_train_fname <- "activity-train.txt"
 
@@ -66,27 +63,6 @@ function(input, output) {
       cat(sprintf("%s\n", act_train_fname))
       act_colnum = input$act_colnum
       cat(sprintf("%d\n", act_colnum))
-      ####
-      
-      #if(input$activity == "activity-train.txt")
-      #{
-      #  act_train_fname = input$activity
-      #  act_train_fname <-c("activity-train.txt")
-      #  cat(sprintf("%s\n", act_train_fname))
-      #}
-      
-    #})
-    ###
-    #act_train_fname =  m()
-    #else{
-    #  act_train_fname = input$activity
-    #  cat(sprintf("%s\n", act_train_fname))}
-    
- 
-    
-     #Yo  
-    #})#reactive
-      
     #
     if(FALSE)
     {
@@ -125,10 +101,7 @@ function(input, output) {
       cat(sprintf("Hey %s", "WASSUP YO?"))
       
       #
-      #output$text1 <- renderText({
-       # m()
-      #})
-      #
+ 
       output$myPlot <- renderPlot({
         ##
         margin=0.5
@@ -142,70 +115,17 @@ function(input, output) {
         xymax <- max(xmax, ymax) + margin
         xlab="Predicted" 
         ylab="Experimental" 
-        
-        
         ##
       plot(model$y_pred_cv, model$y_exp)
       plot(x, y, xlim=c(xymin, xymax), ylim=c(xymin, xymax), xlab=xlab, ylab=ylab)
         abline(coef=c(0,1))
       })
       
-      # Eugene
-      #output$text1 <- renderText({  
-       # paste("You have selected:",input$activity)
-        #paste("You have selected:", "")
-      #})
-      # Eugene
-      
       })#end of reactive     
-    ###
-
-    #load(model_fname)
-    #cat(sprintf("Hey %s", "WASSUP YO?"))
-  #output$myPlot <- renderPlot({
-  #plot(model$y_pred_cv, model$y_exp)
-  #})
-  
-  ##
-  
-  #if(TRUE)
-  #{
-  #output$text <- renderText({  
-   # paste("You have selected:",input$activity)
-    #paste("You have selected:",m())
-  #})
-  #output$text1 <- renderText({ NULL })
-    #output$text1 <-renderText({  
-    #paste("You have selected:",input$activity)
-    #paste("Hey",m())
-     # m()
-  #})
-    # Show the values using an HTML table
-    #output$text <- renderText(
-      #m()
-     # input$activity
-    #)
-    
-#  output$text1 <- renderText({ NULL })
- 
+   
     output$text1 <- renderText({
       m13()
 })
-    
-  #}
+ 
+}
 
-  
-  ##
-  
-#})#reactive
-  }
-
-  #output$phonePlot <- renderPlot({
-
-    # Render a barplot
-    #barplot(WorldPhones[,input$region]*1000,
-    #        main=input$region,
-    #        ylab="Number of Telephones",
-    #        xlab="Year")
-  #})
-#}
