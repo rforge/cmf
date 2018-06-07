@@ -3,7 +3,7 @@
 require(rgl)
 require(misc3d)
 
-grid_view_level <- function(grid, level, alpha=1.0, color_p=PT.Color[["O"]], color_n=PT.Color[["N"]], ...) {
+grid_view_level <- function(grid, level, alpha=1.0, color_p=PT$Color[["O"]], color_n=PT$Color[["N"]], ...) {
   positive_present <- FALSE
   negative_present <- FALSE
   for (igridx in 1:grid$ngridx) {
@@ -29,7 +29,7 @@ grid_view_level <- function(grid, level, alpha=1.0, color_p=PT.Color[["O"]], col
   }
 }
 
-grid_view_part <- function(grid, part=0.01, alpha=1.0, color_p=PT.Color[["O"]], color_n=PT.Color[["N"]], ...) {
+grid_view_part <- function(grid, part=0.01, alpha=1.0, color_p=PT$Color[["O"]], color_n=PT$Color[["N"]], ...) {
   npoints <- grid$ngridx * grid$ngridy * grid$ngridz
   values <- rep(0, npoints)
   ivalue <- 1
@@ -47,7 +47,7 @@ grid_view_part <- function(grid, part=0.01, alpha=1.0, color_p=PT.Color[["O"]], 
   grid_view_level(grid, level, alpha, color_p, color_n, ...)
 }
 
-grid_view_rlevel <- function(grid, rlevel=0.5, alpha=1.0, color_p=PT.Color[["O"]], color_n=PT.Color[["N"]], ...) {
+grid_view_rlevel <- function(grid, rlevel=0.5, alpha=1.0, color_p=PT$Color[["O"]], color_n=PT$Color[["N"]], ...) {
   max_level <- 0
   for (igridx in 1:grid$ngridx) {
     for (igridy in 1:grid$ngridy) {

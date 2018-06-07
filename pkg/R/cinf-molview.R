@@ -17,8 +17,8 @@ mol_view_cpk <- function(mol, reset=TRUE, alpha=1, rfactor=0) {
     x[i] <- atom$x
     y[i] <- atom$y
     z[i] <- atom$z
-    colors[i] <- PT.Color[[atom$el]]
-    radius[i] <- PT.AtRad[[atom$el]] * rfactor
+    colors[i] <- PT$Color[[atom$el]]
+    radius[i] <- PT$AtRad[[atom$el]] * rfactor
   }
   if (reset) {
     open3d()
@@ -47,11 +47,11 @@ mol_view_lines <- function(mol) {
     y[2] <- my
     z[1] <- atom1$z
     z[2] <- mz
-    lines3d(x, y, z, color=PT.Color[[atom1$el]])
+    lines3d(x, y, z, color=PT$Color[[atom1$el]])
     x[1] <- atom2$x
     y[1] <- atom2$y
     z[1] <- atom2$z
-    lines3d(x, y, z, color=PT.Color[[atom2$el]])
+    lines3d(x, y, z, color=PT$Color[[atom2$el]])
   }
 }
 
@@ -75,10 +75,10 @@ mol_view_cylindres <- function(mol) {
     y[2] <- my
     z[1] <- atom1$z
     z[2] <- mz
-    shade3d( cylinder3d(cbind(x,y,z), radius=0.1), color=PT.Color[[atom1$el]])
+    shade3d( cylinder3d(cbind(x,y,z), radius=0.1), color=PT$Color[[atom1$el]])
     x[1] <- atom2$x
     y[1] <- atom2$y
     z[1] <- atom2$z
-    shade3d( cylinder3d(cbind(x,y,z), radius=0.1), color=PT.Color[[atom2$el]])
+    shade3d( cylinder3d(cbind(x,y,z), radius=0.1), color=PT$Color[[atom2$el]])
   }
 }
