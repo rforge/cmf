@@ -55,8 +55,8 @@ q2r <- function(q1=1, q2=0, q3=0, q4=0) {
   r
 }
 
-superpose_mol_seal <- function(mol_m, mol_t, verbose=TRUE, maxit=100, ntrials=5) {
-
+superpose_mol_seal <- function(mol_m, mol_t, verbose=TRUE, maxit=100) {
+  
   calc_mol2mol_transvec <- function(mol_m, mol_r) {
     xyz_m <- mol2xyz(mol_m)
     xyz_r <- mol2xyz(mol_r)
@@ -64,7 +64,7 @@ superpose_mol_seal <- function(mol_m, mol_t, verbose=TRUE, maxit=100, ntrials=5)
     mean_r <- rowMeans(xyz_r)
     mean_r - mean_m
   }
-
+  
   apply_par_list <- function(xyz_m, par_list) {
     q1 <- par_list[1]
     q2 <- par_list[2]
@@ -76,43 +76,31 @@ superpose_mol_seal <- function(mol_m, mol_t, verbose=TRUE, maxit=100, ntrials=5)
     R <- q2r(q1, q2, q3, q4)
     Tr <- c(t1, t2, t3)
     xyz_a <- R %*% xyz_m + T
-	xyz_a
+    xyz_a
   }
   
-  fr <- function(par_list) {
-	xyz_a <- apply_par_list(xyz_m, par_list)
-    af <- calc_af(xyz_a, xyz_t, wij)
+  fr <- function(par_list, ...) {
+    xyz_a <- apply_par_list(xyz_m, par_list)
+    af <- calc_af(xyz_a, xyz_t, wij, ...)
     if (verbose) cat(sprintf("af=%g q1=%g q2=%g q3=%g q4=%g t1=%g t2=%g t3=%g\n", 
-      af, par_list[1], par_list[2], par_list[3], par_list[4], par_list[5], par_list[6], 
-	  par_list[7])); flush.console()
+                             af, par_list[1], par_list[2], par_list[3], par_list[4], par_list[5], par_list[6], 
+                             par_list[7])); flush.console()
     af
   }
-
+  
   wij <- calc_wij(mol_m, mol_t)
   xyz_m <- mol2xyz(mol_m)
   xyz_t <- mol2xyz(mol_t)
-  t1 <- calc_mol2mol_transvec(mol_m, mol_t)
   
   if (verbose) cat("Trial 1\n")
   set.seed(1)
-  res <- optim(c(1,0,0,0,t1[1],t1[2],t1[3]), fr, control=list(maxit=maxit))
+  res1 <- optim(c(1,0,0,0,0,0,0), fr, control=list(maxit=maxit),
+                method = "BFGS", alpha=0.1)
+  res2 <- optim(res1$par, fr, control=list(maxit=maxit),
+                method = "BFGS", alpha=0.29)
   
-  res_best <- res
-  res_value_best <- res$value
-  if (ntrials > 1) {
-    for (itrial in 2:ntrials) {
-      if (verbose) cat(sprintf("Trial %d\n", itrial))
-	  set.seed(itrial)
-	  mol_m <- pert_mol(mol_m)
-      xyz_m <- mol2xyz(mol_m)
-      res <- optim(c(1,0,0,0,t1[1],t1[2],t1[3]), fr, control=list(maxit=maxit))
-	  if (res$value < res_value_best) {
-	    res_value_best <- res$value
-		res_best <- res
-	  }
-      if (verbose) cat(sprintf("Best value = %g\n", res_value_best))
-	}
-  }
+  res_best <- res2
+  res_value_best <- res2$value
   
   xyz_a <- apply_par_list(xyz_m, res_best$par)
   mol_a <- xyz2mol(mol_m, xyz_a)
