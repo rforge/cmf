@@ -4,18 +4,21 @@
 #source("cinf-isomorph.R")
 #source("cinf-mol.R")
 
+# Extraction of the matrix of Cartesian coordinates (xyz[3 x natoms]) 
+# from molecule mol
 mol2xyz <- function(mol) {
   natoms <- length(mol$atoms)
   xyz <- matrix(0, 3, natoms)
   for (iatom in 1:natoms) {
     atom <- mol$atoms[[iatom]]
-	xyz[1, iatom] <- atom$x
-	xyz[2, iatom] <- atom$y
-	xyz[3, iatom] <- atom$z
+    xyz[1, iatom] <- atom$x
+    xyz[2, iatom] <- atom$y
+    xyz[3, iatom] <- atom$z
   }
   xyz
 }
 
+# Setting Cartesian coordinates from matrix xyz[3 x natoms] to molecule
 xyz2mol <- function(mol, xyz) {
   mol1 <- mol
   natoms <- length(mol$atoms)
@@ -86,8 +89,8 @@ rnd_trans_vec <- function(coef_=1) {
 pert_mol <- function(mol, tcoef=10) {
   xyz <- mol2xyz(mol)
   R <- rnd_euler_orth()
-  T <- rnd_trans_vec(tcoef)
-  xyz_p <- R %*% xyz + T
+  Tr <- rnd_trans_vec(tcoef)
+  xyz_p <- R %*% xyz + Tr
   xyz2mol(mol, xyz_p)
 }
 
@@ -96,9 +99,9 @@ pert_mdb <- function(mdb, tcoef=10) {
   ncomp <- length(mdb)
   mdb_p <- list()
   for (imol in 1:ncomp) {
-     mol <- mdb[[imol]]
-     mol_p <- pert_mol(mol, tcoef)
-	 mdb_p[[imol]] <- mol_p
+    mol <- mdb[[imol]]
+    mol_p <- pert_mol(mol, tcoef)
+    mdb_p[[imol]] <- mol_p
   }
   mdb_p
 }
@@ -106,9 +109,9 @@ pert_mdb <- function(mdb, tcoef=10) {
 # Rigin alignment with Arun algorithm
 # K.S.Arun, T.S.Huang, S.D.Blostein, "Least Square Fitting of Two 3-D Point Sets",
 # IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE, VOL. PAMI-9, NO. 5, 1987, pp. 698-700
-# Two point sets {p_i} and {p1_i}; i=1,2,...,N are related by p1_i = R * p_i + T + Ni, 
-# where R is a rotetion matrix, T a translation vector, and N_i a noise vector.
-# the algorithm finds the least-squares solution of R and T.
+# Two point sets {p_i} and {p1_i}; i=1,2,...,N are related by p1_i = R * p_i + Tr + Ni, 
+# where R is a rotetion matrix, Tr a translation vector, and N_i a noise vector.
+# the algorithm finds the least-squares solution of R and Tr.
 align_arun <- function(p_i, p1_i) {
   # Step 1: From {p_i}, {p1_i} calculate p. p1; and then {q_i}, {q1_i}
   p <- rowMeans(p_i)
@@ -130,20 +133,20 @@ align_arun <- function(p_i, p1_i) {
   # Step 5: Calculate, det (x), the determinant of X
   detx <- det(X)
   R <- X
-  T <- p1 - R %*% p
+  Tr <- p1 - R %*% p
   
-  list(R=R, T=T, detx=detx)
+  list(R=R, Tr=Tr, detx=detx)
 }
 
-transform_xyz <- function(xyz, R, T) {
+transform_xyz <- function(xyz, R, Tr) {
   n <- dim(xyz)[2]
   ones <- double(n) + 1
-  R %*% xyz + T %*% ones
+  R %*% xyz + Tr %*% ones
 }
 
-transform_mol <- function(mol, R, T) {
+transform_mol <- function(mol, R, Tr) {
   xyz <- mol2xyz(mol)
-  xyz1 <- transform_xyz(xyz, R, T)
+  xyz1 <- transform_xyz(xyz, R, Tr)
   xyz2mol(mol, xyz1)
 }
 
@@ -152,7 +155,7 @@ superpose_mol <- function(mol_m, mol_t) {
   xyz_m <- mol2xyz(mol_m)
   xyz_t <- mol2xyz(mol_t)
   align <- align_arun(xyz_m, xyz_t)
-  xyz_a <- transform_xyz(xyz_m, align$R, align$T)
+  xyz_a <- transform_xyz(xyz_m, align$R, align$Tr)
   xyz2mol(mol_m, xyz_a)
 }
 
@@ -179,36 +182,36 @@ align_mdb_template <- function(mdb, templ, iimol=1:length(mdb)) {
   for (imol in iimol) {
     imol1 <- imol1 + 1
     mol <- mdb[[imol]]
-	mol_ct <- mol_get_ct(mol)
-	mol_lab <- mol_get_chelabs(mol)
-	xyz_m <- mol2xyz(mol)
-	isom_list <- find_substr_isomorph(templ_lab, templ_ct, mol_lab, mol_ct)
-	nisom <- length(isom_list)	
-	substr_mol <- substruct(mol, isom_list[[1]])
-	xyz_ss <- mol2xyz(substr_mol)
-	align <- align_arun(xyz_ss, xyz_t)
-	xyz_ss_a <- transform_xyz(xyz_ss, align$R, align$T)
-	rmse_a <- rmse4xyz(xyz_ss_a, xyz_t)
-	align_best <- align
-	rmse_a_best <- rmse_a
-	if (nisom > 1) {
-	  for (isom in 2:nisom) {
-	    substr_mol <- substruct(mol, isom_list[[isom]])
-	    xyz_ss <- mol2xyz(substr_mol)
-	    align <- align_arun(xyz_ss, xyz_t)
-	    xyz_ss_a <- transform_xyz(xyz_ss, align$R, align$T)
-	    rmse_a <- rmse4xyz(xyz_ss_a, xyz_t)
-	    if (rmse_a < rmse_a_best) {
-		  align_best <- align
-		  rmse_a_best <- rmse_a
-		}
-	  }
-	}
-    xyz_a <- transform_xyz(xyz_m, align_best$R, align_best$T)
+    mol_ct <- mol_get_ct(mol)
+    mol_lab <- mol_get_chelabs(mol)
+    xyz_m <- mol2xyz(mol)
+    isom_list <- find_substr_isomorph(templ_lab, templ_ct, mol_lab, mol_ct)
+    nisom <- length(isom_list)	
+    substr_mol <- substruct(mol, isom_list[[1]])
+    xyz_ss <- mol2xyz(substr_mol)
+    align <- align_arun(xyz_ss, xyz_t)
+    xyz_ss_a <- transform_xyz(xyz_ss, align$R, align$Tr)
+    rmse_a <- rmse4xyz(xyz_ss_a, xyz_t)
+    align_best <- align
+    rmse_a_best <- rmse_a
+    if (nisom > 1) {
+      for (isom in 2:nisom) {
+        substr_mol <- substruct(mol, isom_list[[isom]])
+        xyz_ss <- mol2xyz(substr_mol)
+        align <- align_arun(xyz_ss, xyz_t)
+        xyz_ss_a <- transform_xyz(xyz_ss, align$R, align$Tr)
+        rmse_a <- rmse4xyz(xyz_ss_a, xyz_t)
+        if (rmse_a < rmse_a_best) {
+          align_best <- align
+          rmse_a_best <- rmse_a
+        }
+      }
+    }
+    xyz_a <- transform_xyz(xyz_m, align_best$R, align_best$Tr)
     mol_a <- xyz2mol(mol, xyz_a)
-	mdb_a[[imol1]] <- mol_a
-	cat(sprintf("imol=%d imol1=%d nisom=%d detx=%g rmse1=%g rmse2=%g\n", 
-	  imol, imol1, nisom, align$detx, rmse4mol(substr_mol,templ), rmse_a_best)); flush.console()
+    mdb_a[[imol1]] <- mol_a
+    cat(sprintf("imol=%d imol1=%d nisom=%d detx=%g rmse1=%g rmse2=%g\n", 
+                imol, imol1, nisom, align$detx, rmse4mol(substr_mol,templ), rmse_a_best)); flush.console()
   }
   mdb_a
 }
